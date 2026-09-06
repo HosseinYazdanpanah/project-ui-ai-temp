@@ -1,0 +1,2644 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HAFS — Hossein AI Freelance System</title>
+  <style>
+    :root{
+      --bg:#0b1020;--panel:#11182d;--panel2:#151f38;--line:#263252;
+      --text:#eef3ff;--muted:#9aa8c7;--accent:#7c8cff;--accent2:#39d0b5;
+      --warn:#ffbd59;--danger:#ff6b7a;--ok:#4cd18b;--shadow:0 18px 50px rgba(0,0,0,.25);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0a0f1e,#0d1324 35%,#0b1020);color:var(--text);font-family:Tahoma,Arial,sans-serif}
+    button,input,textarea,select{font:inherit}
+    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+    aside{border-left:1px solid var(--line);background:rgba(9,14,27,.92);padding:18px;position:sticky;top:0;height:100vh;overflow:auto}
+    .brand{padding:8px 6px 18px}
+    .brand h1{font-size:20px;margin:0 0 8px}
+    .brand p{margin:0;color:var(--muted);font-size:12px;line-height:1.8}
+    .nav{display:flex;flex-direction:column;gap:8px}
+    .workflow-label{margin:18px 4px 8px;color:#7382a9;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .nav-step{position:relative;display:grid!important;grid-template-columns:32px 1fr auto;align-items:center;gap:10px}
+    .nav-step .step-no{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:#111a31;border:1px solid var(--line);color:#8e9bbd;font-size:11px;font-weight:700}
+    .nav-step .step-copy{min-width:0}
+    .nav-step .step-copy strong{display:block;color:inherit;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .nav-step .step-copy small{display:block;margin-top:3px;color:#7481a4;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .nav-step .step-state{width:10px;height:10px;border-radius:999px;background:#55617f;box-shadow:0 0 0 3px rgba(85,97,127,.10)}
+    .nav-step.step-approved .step-no{background:#123021;border-color:#2f805a;color:#bfffd9}
+    .nav-step.step-approved .step-state{background:var(--ok);box-shadow:0 0 0 3px rgba(76,209,139,.12)}
+    .nav-step.step-active .step-no{background:#222e57;border-color:#6375d7;color:#fff}
+    .nav-step.step-active .step-state{background:var(--accent);box-shadow:0 0 0 3px rgba(124,140,255,.15)}
+    .nav-step.step-locked{opacity:.48;cursor:not-allowed!important}
+    .nav-step.step-locked .step-state{background:#3b4358}
+    .workflow-summary{margin:0 0 14px;padding:12px 13px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#121a30,#0d1528)}
+    .workflow-summary .eyebrow{font-size:9px;color:#7685aa;text-transform:uppercase;letter-spacing:.08em}
+    .workflow-summary b{display:block;margin-top:5px;font-size:13px}
+    .workflow-summary small{display:block;color:var(--muted);margin-top:5px;line-height:1.5}
+    .current-step-card{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding:14px 16px;border:1px solid #33416a;border-radius:16px;background:linear-gradient(135deg,#151f3b,#10172c)}
+    .current-step-card .big-step{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#222e57;border:1px solid #5064c7;font-weight:700}
+    .current-step-card .meta{flex:1}
+    .current-step-card .meta small{color:#8795b8;font-size:10px}
+    .current-step-card .meta b{display:block;margin-top:4px}
+    .current-step-card .meta span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+    .dashboard-cta{margin-top:18px;padding:18px;border:1px solid #3a4b7b;border-radius:18px;background:linear-gradient(135deg,#172142,#11192f)}
+    .dashboard-cta h3{margin:0 0 7px;font-size:16px}
+    .dashboard-cta p{margin:0;color:var(--muted);font-size:12px;line-height:1.8}
+    .dashboard-cta .cta-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
+    .dashboard-cta .cta-main{padding:13px 18px;font-weight:700;background:linear-gradient(90deg,var(--accent),#6b78ff)}
+    .wizard-action-bar{position:sticky;bottom:12px;z-index:30;margin-top:18px;padding:14px;border:1px solid #35456f;border-radius:16px;background:rgba(12,18,35,.96);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow)}
+    .wizard-action-bar .wizard-meta{min-width:0}
+    .wizard-action-bar .wizard-meta b{display:block;font-size:13px}
+    .wizard-action-bar .wizard-meta small{display:block;color:var(--muted);margin-top:4px;line-height:1.6}
+    .wizard-action-bar .wizard-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .wizard-next{background:linear-gradient(90deg,var(--ok),#61e39b)!important;color:#07140d!important;font-weight:700}
+    .wizard-disabled{opacity:.55;cursor:not-allowed!important}
+    .nav-step{cursor:default!important}
+    .nav-step.step-clickable{cursor:pointer!important}
+    .approval-bar{display:none!important}
+    main{padding:26px 30px 34px;max-width:1600px;width:100%;margin:0 auto}
+    .section>.grid{max-width:1320px;margin:0 auto}
+    .card{padding:22px}
+    .card h3{font-size:17px;letter-spacing:-.01em}
+    .field{position:relative;margin-bottom:18px}
+    .field label{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:#aab7d5;margin-bottom:9px}
+    textarea{min-height:180px;padding:15px 16px;font-size:14px;line-height:2;scrollbar-width:thin}
+    textarea.editor-large{min-height:280px}
+    .field-tools{position:absolute;left:9px;top:28px;display:flex;gap:6px;z-index:5}
+    .icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:rgba(18,27,48,.94);color:#b9c5e1;display:grid;place-items:center;cursor:pointer;transition:.18s;font-size:14px}
+    .icon-btn:hover{background:#202d4f;color:#fff;border-color:#43547e;transform:translateY(-1px)}
+    .field textarea.has-tools{padding-left:132px}
+    .editor-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:7px;color:#7280a2;font-size:10px}
+    .editor-meta .counter{direction:ltr}
+    .section-head{max-width:1320px;margin:0 auto 16px;padding:0 2px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+    .section-head .section-copy h2{margin:0;font-size:22px}
+    .section-head .section-copy p{margin:7px 0 0;color:var(--muted);font-size:12px;line-height:1.8}
+    .section-kicker{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#7786aa;margin-bottom:6px}
+    .workspace-hint{display:flex;gap:8px;align-items:center;color:#8f9dbc;font-size:11px}
+    .workspace-hint kbd{border:1px solid var(--line);background:#0d1528;border-radius:7px;padding:3px 6px;color:#bdc8e4;font-family:inherit}
+    .fullscreen-editor{position:fixed;inset:0;z-index:10000;background:rgba(5,8,16,.98);display:none;flex-direction:column}
+    .fullscreen-editor.open{display:flex}
+    .fs-topbar{height:66px;flex:0 0 auto;border-bottom:1px solid #222d49;background:#0b1120;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 20px}
+    .fs-title-wrap{min-width:0}
+    .fs-title-wrap small{display:block;color:#7887a9;font-size:10px;margin-bottom:4px}
+    .fs-title-wrap b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .fs-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .fs-body{flex:1;min-height:0;padding:22px;display:flex;justify-content:center}
+    .fs-editor-wrap{width:min(1180px,100%);display:flex;flex-direction:column;min-height:0}
+    #fullscreenTextarea{flex:1;min-height:0;width:100%;resize:none;border-radius:16px;background:#0b1324;border:1px solid #2a385c;padding:24px;font-size:16px;line-height:2.15;color:#eef3ff;box-shadow:0 16px 60px rgba(0,0,0,.35)}
+    #fullscreenTextarea:focus{border-color:#6778df;box-shadow:0 0 0 3px rgba(124,140,255,.09),0 16px 60px rgba(0,0,0,.35)}
+    .fs-footer{flex:0 0 auto;height:42px;display:flex;align-items:center;justify-content:space-between;color:#7887a9;font-size:10px;padding-top:8px}
+    .fs-footer .fs-count{direction:ltr}
+    .focus-mode aside{display:none}
+    .focus-mode .app{grid-template-columns:1fr}
+    .focus-mode main{max-width:1500px}
+    .top-actions .save-indicator{display:inline-flex;align-items:center;gap:7px;padding:9px 11px;border:1px solid var(--line);border-radius:11px;color:#8391b2;font-size:10px}
+    .save-dot{width:7px;height:7px;border-radius:999px;background:#55617f}
+    .save-dot.saved{background:var(--ok)}
+    .save-dot.saving{background:var(--warn)}
+    .section-nav-card{display:flex;gap:8px;flex-wrap:wrap;margin:0 auto 16px;max-width:1320px}
+    .mini-action{border:1px solid var(--line);background:#10182c;color:#94a1c0;border-radius:10px;padding:7px 10px;font-size:10px;cursor:pointer}
+    .mini-action:hover{background:#17233e;color:#fff}
+    .template-btn{border:1px solid #42517c;background:#131e38;color:#c8d4f2;border-radius:10px;padding:7px 10px;font-size:10px;cursor:pointer}
+    .template-btn:hover{background:#1b294a;color:#fff}
+    .checklist-template-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 12px;padding:10px 11px;border:1px solid var(--line);border-radius:12px;background:#0c1426}
+    .checklist-template-bar .sample-copy{min-width:0}
+    .checklist-template-bar .sample-copy b{display:block;font-size:11px;color:#cbd5ef}
+    .checklist-template-bar .sample-copy small{display:block;margin-top:3px;color:#7180a3;font-size:9px;line-height:1.6}
+    .checklist-template-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .todo-sample{display:block;margin-top:6px;padding:6px 8px;border-radius:8px;background:#111a2f;border:1px dashed #344263;color:#8290b2!important;font-size:9px!important;line-height:1.7}
+    .todo-sample strong{color:#b9c5e1;font-weight:700}
+    .stage.sample-done{border-color:#285f49;background:#0e211a}
+    .stage.sample-pending{border-color:#4b426d;background:#17152a}
+    .stage.sample-review{border-color:#6c5530;background:#251e10}
+    .sample-status{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:999px;border:1px solid var(--line);font-size:8px;margin-inline-start:6px}
+    .sample-status.done{color:#bfffd9;border-color:#2d7656;background:#123021}
+    .sample-status.review{color:#ffe1a6;border-color:#765b2c;background:#30250f}
+    .sample-status.pending{color:#c7d0e8;border-color:#46516f;background:#151c30}
+    .module-template-wrap{width:100%;margin-bottom:10px}
+    .field-template-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:-2px 0 8px}
+    .field-template-row small{color:#7080a4;font-size:10px}
+    .readable-card{max-width:1100px;margin-inline:auto}
+    @media(max-width:900px){
+      main{padding:18px 14px 26px}
+      .field-tools{position:static;margin-top:-2px;margin-bottom:8px}
+      .field textarea.has-tools{padding-left:16px}
+      .fs-topbar{height:auto;min-height:66px;padding:12px;align-items:flex-start}
+      .fs-body{padding:10px}
+      #fullscreenTextarea{padding:16px;font-size:15px}
+      .workspace-hint{display:none}
+    }
+    .nav button{width:100%;border:1px solid transparent;background:transparent;color:var(--muted);padding:12px 14px;border-radius:12px;text-align:right;cursor:pointer;transition:.2s}
+    .nav button:hover,.nav button.active{background:var(--panel2);color:var(--text);border-color:var(--line)}
+    .status-box{margin-top:18px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+    .progress{height:9px;background:#09101f;border-radius:99px;overflow:hidden;margin-top:8px}
+    .progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.3s}
+    main{padding:22px;min-width:0}
+    .topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}
+    .topbar h2{margin:0;font-size:24px}
+    .top-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{border:none;border-radius:12px;padding:10px 14px;cursor:pointer;color:#fff;background:var(--accent);box-shadow:none}
+    .btn.secondary{background:#1b2745;color:var(--text);border:1px solid var(--line)}
+    .btn.ok{background:var(--ok);color:#07140d}
+    .btn.warn{background:var(--warn);color:#251800}
+    .btn.danger{background:var(--danger)}
+    .section{display:none}
+    .section.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .card{grid-column:span 12;background:linear-gradient(180deg,rgba(21,31,56,.95),rgba(16,24,45,.95));border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+    .card.half{grid-column:span 6}.card.third{grid-column:span 4}
+    .card h3{margin:0 0 14px;font-size:16px}
+    .card p.help{color:var(--muted);font-size:12px;line-height:1.9}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}
+    input,textarea,select{width:100%;background:#0d1528;border:1px solid var(--line);border-radius:12px;color:var(--text);padding:11px 12px;outline:none}
+    input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+    textarea{min-height:110px;resize:vertical;line-height:1.8}
+    .field{margin-bottom:13px}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{display:inline-flex;align-items:center;gap:8px;background:#0d1528;border:1px solid var(--line);padding:8px 10px;border-radius:999px;font-size:12px}
+    .chip input{width:auto}
+    .stage{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:14px;background:#0d1528;margin-bottom:10px}
+    .stage .num{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#1d2948;color:#cbd5ff;flex:0 0 auto}
+    .stage .meta{flex:1}.stage .meta b{display:block;margin-bottom:5px}.stage .meta small{color:var(--muted)}
+    .badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;border:1px solid var(--line);color:var(--muted)}
+    .badge.ok{color:#b9ffd8;border-color:#2d7b57;background:#153b2a}
+    .badge.pending{color:#ffe5ad;border-color:#765b2c;background:#30250f}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .output{white-space:pre-wrap;direction:rtl;background:#08101f;border:1px solid var(--line);border-radius:14px;padding:14px;min-height:140px;color:#dce6ff;line-height:1.9;overflow:auto}
+    .ltr{direction:ltr;text-align:left}
+    .notice{padding:12px 14px;border:1px solid #4a5a87;background:#131c34;border-radius:12px;color:#c7d2ef;font-size:12px;line-height:1.8}
+    .danger-note{border-color:#6e3942;background:#2b151a;color:#ffd5da}
+    .mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .footer{color:var(--muted);font-size:11px;padding:24px 0 6px;text-align:center}
+    .approval-bar{margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#111a31,#0d1528);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .approval-bar .approval-info{display:flex;flex-direction:column;gap:5px}
+    .approval-bar .approval-info b{font-size:13px}
+    .approval-bar .approval-info small{color:var(--muted);line-height:1.7}
+    .approval-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .approval-actions .approved-btn{background:#163b2b;color:#baffd7;border:1px solid #2f805a}
+    .approval-actions .pending-btn{background:var(--accent);color:#fff}
+    .toast{position:fixed;left:22px;bottom:22px;z-index:9999;max-width:min(420px,calc(100vw - 44px));padding:12px 15px;border-radius:13px;border:1px solid var(--line);background:#10192f;color:var(--text);box-shadow:var(--shadow);opacity:0;transform:translateY(12px);pointer-events:none;transition:.22s}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .toast.error{border-color:#7b3d49;background:#2a161b;color:#ffd7dd}
+    .toast.ok{border-color:#2f805a;background:#10291f;color:#c8ffdf}
+    @media(max-width:900px){
+      .app{grid-template-columns:1fr}
+      aside{position:relative;height:auto;border-left:none;border-bottom:1px solid var(--line)}
+      .nav{display:grid;grid-template-columns:1fr}
+      .card.half,.card.third{grid-column:span 12}
+      .topbar{align-items:flex-start;flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">
+      <h1>HAFS</h1>
+      <p>Hossein AI Freelance System<br>کنترل کامل پروژه‌های فریلنسری وب</p>
+    </div>
+
+    <div class="workflow-summary">
+      <div class="eyebrow">PROJECT WORKFLOW</div>
+      <b id="workflowProjectName">پروژه جدید</b>
+      <small id="workflowNextText">مرحله بعدی را از بالا به پایین انجام بده.</small>
+    </div>
+
+    <div class="nav" id="nav">
+      <button class="nav-step active" data-section="dashboard" data-order="0">
+        <span class="step-no">00</span>
+        <span class="step-copy"><strong>داشبورد</strong><small>نمای کلی و کنترل پیشرفت</small></span>
+        <span class="step-state"></span>
+      </button>
+
+      <div class="workflow-label">Discovery & Planning</div>
+
+      <button class="nav-step" data-section="intake" data-order="1">
+        <span class="step-no">01</span>
+        <span class="step-copy"><strong>دریافت پروژه</strong><small>Client Intake</small></span>
+        <span class="step-state"></span>
+      </button>
+
+      <button class="nav-step" data-section="interview" data-order="2">
+        <span class="step-no">02</span>
+        <span class="step-copy"><strong>مصاحبه کارفرما</strong><small>Client Interview</small></span>
+        <span class="step-state"></span>
+      </button>
+
+      <button class="nav-step" data-section="classification" data-order="3">
+        <span class="step-no">03</span>
+        <span class="step-copy"><strong>نوع سایت و Site DNA</strong><small>Classification & Composition</small></span>
+        <span class="step-state"></span>
+      </button>
+
+      <button class="nav-step" data-section="scenario" data-order="4">
+        <span class="step-no">04</span>
+        <span class="step-copy"><strong>سناریو و معماری</strong><small>Scenario & Architecture</small></span>
+        <span class="step-state"></span>
+      </button>
+
+      <div class="workflow-label">Execution</div>
+
+      <button class="nav-step" data-section="codex" data-order="5">
+        <span class="step-no">05</span>
+        <span class="step-copy"><strong>Promptهای Codex</strong><small>Prompt Pack</small></span>
+        <span class="step-state"></span>
+      </button>
+
+      <button class="nav-step" data-section="build" data-order="6">
+        <span class="step-no">06</span>
+        <span class="step-copy"><strong>ساخت پروژه</strong><small>Implementation</small></span>
+        <span class="step-state"></span>
+      </button>
+
+      <div class="workflow-label">QA & Release</div>
+
+      <button class="nav-step" data-section="qa1" data-order="7">
+        <span class="step-no">07</span>
+        <span class="step-copy"><strong>QA قبل از انتشار</strong><small>Pre-Deploy + Security #1</small></span>
+        <span class="step-state"></span>
+      </button>
+
+      <button class="nav-step" data-section="deploy" data-order="8">
+        <span class="step-no">08</span>
+        <span class="step-copy"><strong>Preview و Deployment</strong><small>DashPloy / Production</small></span>
+        <span class="step-state"></span>
+      </button>
+
+      <button class="nav-step" data-section="qa2" data-order="9">
+        <span class="step-no">09</span>
+        <span class="step-copy"><strong>QA بعد از انتشار</strong><small>Production + Security + SEO</small></span>
+        <span class="step-state"></span>
+      </button>
+
+      <div class="workflow-label">Delivery</div>
+
+      <button class="nav-step" data-section="handover" data-order="10">
+        <span class="step-no">10</span>
+        <span class="step-copy"><strong>تحویل پروژه</strong><small>Client Handover</small></span>
+        <span class="step-state"></span>
+      </button>
+    </div>
+
+    <div class="status-box">
+      <b>پیشرفت پروژه</b>
+      <div class="progress"><span id="progressBar"></span></div>
+      <div id="progressText" style="margin-top:8px;color:var(--muted);font-size:12px">۰٪ تکمیل شده</div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="current-step-card" id="currentStepCard">
+      <div class="big-step" id="currentStepNumber">00</div>
+      <div class="meta">
+        <small>مرحله فعلی پروژه</small>
+        <b id="currentStepName">داشبورد</b>
+        <span id="currentStepHint">وضعیت کلی پروژه و مسیر بعدی را بررسی کن.</span>
+      </div>
+      <span class="badge pending" id="currentStepStatus">Active</span>
+    </div>
+    <div class="topbar">
+      <div>
+        <h2 id="pageTitle">داشبورد پروژه</h2>
+        <div style="color:var(--muted);font-size:12px;margin-top:5px">همه اطلاعات در مرورگر شما با LocalStorage ذخیره می‌شود.</div>
+      </div>
+      <div class="top-actions">
+        <div class="save-indicator"><span id="saveDot" class="save-dot saved"></span><span id="saveText">ذخیره شده</span></div>
+        <button class="btn secondary" onclick="toggleFocusMode()">حالت تمرکز</button>
+        <button class="btn secondary" onclick="saveAll()">ذخیره</button>
+        <button class="btn secondary" onclick="exportProject()">Export کامل JSON</button>
+        <label class="btn secondary" style="cursor:pointer">Import کامل JSON<input id="importFile" type="file" accept=".json" hidden></label>
+        <button class="btn danger" onclick="resetProject()">ریست پروژه</button>
+      </div>
+    </div>
+
+    <div class="notice" style="max-width:1320px;margin:0 auto 18px">
+      <b>Backup کامل پروژه:</b>
+      Import/Export شامل تمام فیلدها، همه مراحل Wizard، Approvalها، Moduleها، Checklistها، مرحله فعلی، Codex Prompt و Handover Output است.
+    </div>
+
+    <section id="dashboard" class="section active">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">PROJECT COMMAND CENTER</div>
+          <h2>داشبورد پروژه</h2>
+          <p>وضعیت کلی، مرحله بعدی و پیشرفت پروژه را از اینجا کنترل کن.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card half">
+          <h3>خلاصه پروژه</h3>
+          <div class="field"><label>نام پروژه</label><input id="projectName" placeholder="مثلاً فروشگاه پوشاک آریا" value="فروشگاه آنلاین پوشاک آریا"></div>
+          <div class="field"><label>نام کارفرما</label><input id="clientName" placeholder="نام یا شرکت" value="شرکت آریا استایل"></div>
+          <div class="field"><label>وضعیت</label>
+            <select id="projectStatus">
+              <option>Lead</option><option>Interview</option><option selected>Planning</option><option>Approved</option>
+              <option>Building</option><option>Testing</option><option>Preview</option><option>Production</option><option>Handover</option><option>Completed</option>
+            </select>
+          </div>
+        </div>
+        <div class="card half">
+          <h3>قانون اصلی تیم</h3>
+          <div class="notice">این نسخه به‌صورت Wizard مرحله‌به‌مرحله کار می‌کند: از داشبورد «شروع/ادامه پروژه» را بزن، هر صفحه را کامل کن، و فقط با دکمه «تأیید مرحله و ادامه» به مرحله بعد برو. پرش به مراحل آینده امکان‌پذیر نیست.</div>
+          <div class="notice" style="margin-top:10px">
+            راهنما: کنار فیلدهای متنی از <b>⛶</b> برای تمام‌صفحه، <b>⧉</b> برای کپی و <b>▤</b> برای درج قالب نمونه استفاده کن.
+          </div>
+          <div class="notice" style="margin-top:10px;border-color:#76602e;background:#2b2413;color:#ffe7aa">
+            <b>حالت نمونه:</b> همه کادرها با یک پروژه فرضی فروشگاه پوشاک پر شده‌اند تا دقیقاً ببینی هر بخش چگونه نوشته می‌شود. قبل از استفاده واقعی، متن‌ها را با اطلاعات کارفرمای خودت جایگزین کن.
+          </div>
+
+        </div>
+        <div class="card">
+          <h3>گیت‌های پروژه</h3>
+          <div id="stageList"></div>
+        </div>
+
+        <div class="card">
+          <div class="dashboard-cta">
+            <h3 id="dashboardCtaTitle">شروع پروژه</h3>
+            <p id="dashboardCtaText">فرآیند را از مرحله اول شروع کن. بعد از هر مرحله، با تأیید تو سیستم خودکار به مرحله بعد می‌رود.</p>
+            <div class="cta-row">
+              <button class="btn cta-main" id="dashboardContinueBtn" onclick="startOrContinueProject()">شروع پروژه</button>
+              <button class="btn secondary" onclick="clearAllSampleFields()">پاک کردن متن‌های نمونه</button>
+              <span class="badge pending" id="dashboardNextBadge">مرحله 01</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="intake" class="section">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">STEP 01</div>
+          <h2>دریافت پروژه</h2>
+          <p>اطلاعات خام کارفرما را وارد کن؛ لازم نیست از همان ابتدا همه‌چیز کامل باشد.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card half">
+          <h3>اطلاعات خام کارفرما</h3>
+          <div class="field"><label>هر چیزی که کارفرما گفته</label><textarea id="clientRaw" placeholder="مثلاً: یه سایت فروشگاهی ساده برای لباس می‌خوام...">کارفرما گفت یک سایت فروشگاهی ساده برای فروش لباس می‌خواهد. سایت باید فارسی و RTL باشد، روی موبایل خوب نمایش داده شود و امکان مدیریت محصولات و سفارش‌ها را داشته باشد. هنوز درباره درگاه پرداخت، روش ارسال، تعداد محصولات و پنل مدیریت جزئیات نداده است.</textarea></div>
+          <div class="field"><label>بودجه / زمان / محدودیت</label><textarea id="constraints" placeholder="اگر مشخص است وارد کنید">بودجه تقریبی: نامشخص
+زمان تحویل: 3 تا 4 هفته
+بازار هدف: ایران
+محدودیت‌ها:
+- هزینه سرویس‌های جانبی پایین باشد
+- مدیریت سایت برای کارفرما ساده باشد
+- در صورت امکان Production روی Vercel
+- Preview/Test روی DashPloy</textarea></div>
+        </div>
+        <div class="card half">
+          <h3>استخراج نیازها</h3>
+          <div class="field"><label>✅ نیازهای قطعی</label><textarea id="knownReq">- فروشگاه اینترنتی
+- زبان فارسی و RTL
+- طراحی Responsive
+- پنل مدیریت
+- مدیریت محصول
+- مدیریت سفارش
+- تجربه کاربری ساده</textarea></div>
+          <div class="field"><label>💡 پیشنهادهای حرفه‌ای</label><textarea id="recommendations">- جستجو و فیلتر محصولات
+- مدیریت موجودی
+- CRM سبک
+- گزارش فروش
+- تخفیف و کوپن
+- SEO پایه
+- Analytics
+- پیامک یا ایمیل وضعیت سفارش</textarea></div>
+          <div class="field"><label>⚠️ فرض‌های موقت</label><textarea id="assumptions">- فعلاً پروژه B2C در نظر گرفته می‌شود
+- یک مدیر اصلی برای پنل وجود دارد
+- موجودی محصولات از داخل پنل مدیریت می‌شود
+- اپ موبایل در فاز اول نیاز نیست</textarea></div>
+          <div class="field"><label>❓ موارد نیازمند تصمیم کارفرما</label><textarea id="clientDecisions">- درگاه پرداخت کدام است؟
+- روش ارسال چیست؟
+- چند محصول در شروع وجود دارد؟
+- آیا محصولات Variant دارند؟
+- آیا فاکتور رسمی نیاز است؟
+- آیا اتصال به نرم‌افزار حسابداری وجود دارد؟</textarea></div>
+        </div>
+      </div>
+    
+      <div class="wizard-action-bar" data-wizard-bar="intake">
+        <div class="wizard-meta">
+          <b id="wizardTitle-intake">تأیید این مرحله</b>
+          <small id="wizardHint-intake">پس از بررسی، این مرحله را تأیید کن تا سیستم خودکار به مرحله بعد برود.</small>
+        </div>
+        <div class="wizard-actions">
+          <button class="btn secondary" onclick="showSection('dashboard', true)">بازگشت به داشبورد</button>
+          <button class="btn wizard-next" id="wizardNext-intake" onclick="approveCurrentStageAndContinue()">تأیید مرحله و ادامه</button>
+        </div>
+      </div>
+</section>
+
+    <section id="interview" class="section">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">STEP 02</div>
+          <h2>مصاحبه کارفرما</h2>
+          <p>سؤال‌های ضروری و مهم را آماده کن تا ابهام‌های واقعی پروژه مشخص شوند.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>سناریوی مصاحبه با کارفرما</h3>
+          <div class="mini-grid">
+            <div class="field"><label>سؤال‌های حیاتی</label><textarea id="criticalQuestions">1) هدف اصلی سایت چیست؟
+2) چه محصول یا خدماتی می‌فروشید؟
+3) کاربران اصلی چه کسانی هستند؟
+4) خرید آنلاین کامل می‌خواهید یا فقط نمایش محصول؟
+5) درگاه پرداخت مشخص است؟
+6) روش ارسال چگونه است؟
+7) پنل مدیریت چه بخش‌هایی باید داشته باشد؟</textarea></div>
+            <div class="field"><label>سؤال‌های مهم</label><textarea id="importantQuestions">1) آیا برند، لوگو و رنگ سازمانی دارید؟
+2) آیا نمونه سایت مورد علاقه دارید؟
+3) آیا به جستجو و فیلتر پیشرفته نیاز دارید؟
+4) آیا مدیریت موجودی و انبار لازم است؟
+5) آیا پیامک سفارش و اعلان لازم است؟
+6) آیا SEO برایتان اهمیت دارد؟</textarea></div>
+            <div class="field"><label>سؤال‌های اختیاری</label><textarea id="optionalQuestions">1) قابلیت‌های آینده‌ای که ممکن است بعداً اضافه شوند چیست؟
+2) آیا اتصال به شبکه‌های اجتماعی یا ابزارهای خارجی نیاز دارید؟
+3) آیا چندزبانه بودن یا اپ موبایل در آینده مطرح است؟
+4) آیا ترجیح خاصی برای هاست یا سرویس‌های پرداخت دارید؟</textarea></div>
+            <div class="field"><label>تصمیم‌های فنی داخلی</label><textarea id="technicalDecisions">- Frontend: Next.js + TypeScript
+- Styling: Tailwind CSS
+- Database: PostgreSQL
+- Auth: Supabase Auth
+- Storage: Supabase Storage / Cloudinary
+- Preview: DashPloy
+- Production: Vercel در صورت سازگاری
+- Architecture: Modular, maintainable, scalable</textarea></div>
+          </div>
+          <div class="toolbar">
+            <button class="btn" onclick="generateInterview()">ساخت مصاحبه پیشنهادی</button>
+            <button class="btn secondary" onclick="copyText('criticalQuestions')">کپی سؤال‌های حیاتی</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="wizard-action-bar" data-wizard-bar="interview">
+        <div class="wizard-meta">
+          <b id="wizardTitle-interview">تأیید این مرحله</b>
+          <small id="wizardHint-interview">پس از بررسی، این مرحله را تأیید کن تا سیستم خودکار به مرحله بعد برود.</small>
+        </div>
+        <div class="wizard-actions">
+          <button class="btn secondary" onclick="showSection('dashboard', true)">بازگشت به داشبورد</button>
+          <button class="btn wizard-next" id="wizardNext-interview" onclick="approveCurrentStageAndContinue()">تأیید مرحله و ادامه</button>
+        </div>
+      </div>
+</section>
+
+    <section id="classification" class="section">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">STEP 03</div>
+          <h2>نوع سایت و Site DNA</h2>
+          <p>ساختار مناسب پروژه را از میان انواع پایه و ترکیبی مشخص کن.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card half">
+          <h3>طبقه‌بندی پروژه</h3>
+          <div class="field"><label>نوع پایه</label>
+            <select id="baseType">
+              <option selected>E-Commerce</option><option>Corporate</option><option>Portfolio</option><option>Booking</option>
+              <option>Education / LMS</option><option>Marketplace</option><option>SaaS</option><option>Directory</option>
+              <option>Community</option><option>Web Application</option><option>Internal Business System</option><option>Custom Hybrid</option>
+            </select>
+          </div>
+          <div class="field"><label>سطح پروژه</label>
+            <select id="projectLevel"><option>Simple</option><option selected>Professional</option><option>Advanced</option><option>Enterprise</option></select>
+          </div>
+          <div class="field"><label>نوع سیستم</label>
+            <select id="systemType">
+              <option>Website</option><option>Web Application</option><option selected>Website + Internal Business Management System</option><option>Platform</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card half">
+          <h3>ماژول‌های ترکیبی</h3>
+          <div class="notice" style="margin-bottom:12px">
+            انتخاب ماژول‌ها اختیاری است. فقط چیزهایی را فعال کن که این پروژه واقعاً نیاز دارد؛ لازم نیست همه گزینه‌ها انتخاب شوند.
+          </div>
+          <div class="chips" id="moduleChips"></div>
+        </div>
+
+        <div class="card">
+          <h3>Site DNA</h3>
+          <div class="field"><textarea id="siteDna" class="ltr" style="min-height:230px">BASE
+E-Commerce
+
+BUSINESS
+B2C
+
+SYSTEM
+Website + Internal Business Management System
+
+COMMERCE
+Products
+Orders
+Inventory
+Payments
+
+MANAGEMENT
+Admin Dashboard
+CRM
+Accounting-lite
+
+CONTENT
+CMS
+Blog
+
+GROWTH
+SEO
+Coupons
+Analytics
+
+AUTOMATION
+SMS
+Email
+n8n
+
+DEPLOYMENT
+DashPloy Preview
+Vercel Production</textarea></div>
+          <button class="btn" onclick="generateDNA()">ساخت Site DNA</button>
+        </div>
+      </div>
+    
+      <div class="wizard-action-bar" data-wizard-bar="classification">
+        <div class="wizard-meta">
+          <b id="wizardTitle-classification">تأیید این مرحله</b>
+          <small id="wizardHint-classification">پس از بررسی، این مرحله را تأیید کن تا سیستم خودکار به مرحله بعد برود.</small>
+        </div>
+        <div class="wizard-actions">
+          <button class="btn secondary" onclick="showSection('dashboard', true)">بازگشت به داشبورد</button>
+          <button class="btn wizard-next" id="wizardNext-classification" onclick="approveCurrentStageAndContinue()">تأیید مرحله و ادامه</button>
+        </div>
+      </div>
+</section>
+
+    <section id="scenario" class="section">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">STEP 04</div>
+          <h2>سناریو و معماری</h2>
+          <p>سناریوی کامل و معماری فنی را قبل از شروع Coding نهایی کن.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Master Project Scenario</h3>
+          <div class="field"><label>هدف و مدل کسب‌وکار</label><textarea id="businessScenario">هدف پروژه:
+ساخت یک فروشگاه آنلاین ساده، سریع و قابل مدیریت برای فروش مستقیم محصولات.
+
+مدل کسب‌وکار:
+B2C
+
+مخاطب:
+مشتریان داخل ایران، عمدتاً کاربران موبایل.
+
+هدف اصلی کاربر:
+پیدا کردن محصول، بررسی جزئیات و خرید سریع.
+
+هدف کسب‌وکار:
+افزایش فروش، مدیریت ساده سفارش‌ها و کاهش کار دستی.</textarea></div>
+          <div class="field"><label>کاربران، نقش‌ها و User Journey</label><textarea id="userScenario">نقش‌ها:
+1) Guest
+2) Customer
+3) Admin
+
+User Journey:
+Guest → Home → Category → Product → Cart → Login/Signup → Checkout → Payment → Order Confirmation
+
+Admin Journey:
+Login → Dashboard → Products / Orders / Customers / Reports</textarea></div>
+          <div class="field"><label>صفحات</label><textarea id="pagesScenario">Public:
+- Home
+- Shop
+- Categories
+- Product Detail
+- Search
+- About
+- Contact
+- FAQ
+
+Auth:
+- Login
+- Signup
+- Forgot Password
+
+Customer:
+- Dashboard
+- Orders
+- Profile
+- Addresses
+
+Admin:
+- Dashboard
+- Products
+- Orders
+- Customers
+- Inventory
+- Reports
+- Settings</textarea></div>
+          <div class="field"><label>قابلیت‌ها و Back Office</label><textarea id="featureScenario">Required:
+- Product Management
+- Cart
+- Checkout
+- Orders
+- Payment
+- Admin Dashboard
+
+Recommended:
+- Inventory
+- Search
+- Filters
+- Coupons
+- Analytics
+- CRM-lite
+
+Optional:
+- Loyalty
+- Referral
+- Wishlist
+
+Future:
+- AI Assistant
+- Recommendations</textarea></div>
+          <div class="field"><label>UI / UX و Design System</label><textarea id="designScenario">Style:
+Modern / Minimal / Clean
+
+UX:
+- Mobile-first
+- RTL
+- ساده و سریع
+- Navigation واضح
+- Checkout کوتاه
+
+Design System:
+- 8px spacing system
+- Radius متوسط
+- Typography خوانا
+- Component states کامل
+- Loading / Empty / Error States
+
+Accessibility:
+- Contrast مناسب
+- Keyboard navigation
+- Label برای فرم‌ها</textarea></div>
+          <div class="field"><label>Architecture / Stack</label><textarea id="architectureScenario">Frontend:
+Next.js + TypeScript + Tailwind
+
+Backend:
+Next.js Server Actions / Route Handlers
+
+Database:
+PostgreSQL
+
+Auth:
+Supabase Auth
+
+Storage:
+Supabase Storage
+
+Architecture:
+Modular Feature-Based Structure
+
+Deployment:
+DashPloy Preview
+Vercel Production
+
+Principles:
+- Maintainable
+- Secure
+- Scalable
+- Minimal vendor lock-in</textarea></div>
+          <div class="field"><label>SEO / AEO / GEO</label><textarea id="seoScenario">SEO:
+- Metadata
+- Canonical
+- Sitemap
+- robots.txt
+- Product Schema
+- Breadcrumb Schema
+- Open Graph
+- Internal Linking
+
+AEO:
+- FAQ structure
+- Clear question/answer sections
+
+GEO:
+- Structured factual content
+- Entity-rich pages
+- Clear summaries</textarea></div>
+          <div class="field"><label>Security / Performance / Monitoring</label><textarea id="opsScenario">Security:
+- Auth/Authorization
+- Rate Limiting
+- Input Validation
+- Secure Cookies
+- Security Headers
+- Secret Scanning
+- Dependency Scan
+- Authorized Pentest
+
+Performance:
+- Image Optimization
+- Lazy Loading
+- Caching
+- Core Web Vitals
+
+Monitoring:
+- Uptime
+- Error Logs
+- Analytics
+- Security Events</textarea></div>
+          <div class="toolbar">
+            <button class="btn" onclick="generateScenario()">ساخت سناریوی پایه از داده‌ها</button>
+
+          </div>
+        </div>
+      </div>
+    
+      <div class="wizard-action-bar" data-wizard-bar="scenario">
+        <div class="wizard-meta">
+          <b id="wizardTitle-scenario">تأیید این مرحله</b>
+          <small id="wizardHint-scenario">پس از بررسی، این مرحله را تأیید کن تا سیستم خودکار به مرحله بعد برود.</small>
+        </div>
+        <div class="wizard-actions">
+          <button class="btn secondary" onclick="showSection('dashboard', true)">بازگشت به داشبورد</button>
+          <button class="btn wizard-next" id="wizardNext-scenario" onclick="approveCurrentStageAndContinue()">تأیید مرحله و ادامه</button>
+        </div>
+      </div>
+</section>
+
+    <section id="codex" class="section">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">STEP 05</div>
+          <h2>Promptهای Codex</h2>
+          <p>Promptهای مرحله‌ای، محدود و قابل کنترل برای اجرای پروژه تولید کن.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card third">
+          <h3>مرحله Prompt</h3>
+          <div class="field"><label>فاز</label>
+            <select id="codexPhase">
+              <option selected>00 — Project Context</option><option>01 — Architecture</option><option>02 — Initialization</option>
+              <option>03 — Design System</option><option>04 — Layout</option><option>05 — Database</option>
+              <option>06 — Authentication</option><option>07 — Core Features</option><option>08 — Admin Panel</option>
+              <option>09 — Business Management</option><option>10 — Integrations</option><option>11 — Payments</option>
+              <option>12 — Automation</option><option>13 — SEO / AEO / GEO</option><option>14 — Security</option>
+              <option>15 — Performance</option><option>16 — Testing</option><option>17 — Bug Fixing</option>
+              <option>18 — Deployment</option><option>19 — Documentation</option>
+            </select>
+          </div>
+          <button class="btn" onclick="generateCodexPrompt()">ساخت Prompt</button>
+        </div>
+        <div class="card" style="grid-column:span 9;min-height:420px">
+          <h3>Codex Prompt</h3>
+          <div id="codexOutput" class="output ltr">PROJECT: فروشگاه آنلاین پوشاک آریا
+PHASE: 00 — Project Context
+
+OBJECTIVE:
+Create the approved project foundation for a professional RTL Persian e-commerce website.
+
+CORE REQUIREMENTS:
+- Next.js + TypeScript
+- Responsive / Mobile-first
+- Admin dashboard
+- Products, inventory, cart, checkout and orders
+- Security and maintainability
+- Stop after this phase and report changes for approval.</div>
+          <div class="toolbar"><button class="btn secondary" onclick="copyOutput('codexOutput')">کپی Prompt</button></div>
+        </div>
+      </div>
+    
+      <div class="wizard-action-bar" data-wizard-bar="codex">
+        <div class="wizard-meta">
+          <b id="wizardTitle-codex">تأیید این مرحله</b>
+          <small id="wizardHint-codex">پس از بررسی، این مرحله را تأیید کن تا سیستم خودکار به مرحله بعد برود.</small>
+        </div>
+        <div class="wizard-actions">
+          <button class="btn secondary" onclick="showSection('dashboard', true)">بازگشت به داشبورد</button>
+          <button class="btn wizard-next" id="wizardNext-codex" onclick="approveCurrentStageAndContinue()">تأیید مرحله و ادامه</button>
+        </div>
+      </div>
+</section>
+
+    <section id="build" class="section">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">STEP 06</div>
+          <h2>ساخت پروژه</h2>
+          <p>ساخت را مرحله‌ای دنبال کن و Checklist اجرای پروژه را تکمیل کن.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Build Stages <span class="badge pending">اختیاری</span></h3>
+          <div class="notice" style="margin-bottom:12px">
+            <b>قانون Checklist:</b> این گزینه‌ها اجباری نیستند. فقط مواردی را انتخاب کن که برای پروژه و قرارداد کارفرما مرتبط هستند؛ خالی بودن بقیه مانع تأیید و رفتن به مرحله بعد نمی‌شود.
+          </div>
+          <div id="buildChecklist"></div>
+        </div>
+      </div>
+    
+      <div class="wizard-action-bar" data-wizard-bar="build">
+        <div class="wizard-meta">
+          <b id="wizardTitle-build">تأیید این مرحله</b>
+          <small id="wizardHint-build">پس از بررسی، این مرحله را تأیید کن تا سیستم خودکار به مرحله بعد برود.</small>
+        </div>
+        <div class="wizard-actions">
+          <button class="btn secondary" onclick="showSection('dashboard', true)">بازگشت به داشبورد</button>
+          <button class="btn wizard-next" id="wizardNext-build" onclick="approveCurrentStageAndContinue()">تأیید مرحله و ادامه</button>
+        </div>
+      </div>
+</section>
+
+    <section id="qa1" class="section">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">STEP 07</div>
+          <h2>QA قبل از انتشار</h2>
+          <p>پروژه، UX و امنیت را قبل از هر انتشار عمومی بررسی کن.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card half">
+          <h3>QA #1 — Pre-Deployment <span class="badge pending">موارد مرتبط</span></h3>
+          <div class="notice" style="margin-bottom:12px">
+            <b>قانون Checklist:</b> این گزینه‌ها اجباری نیستند. فقط مواردی را انتخاب کن که برای پروژه و قرارداد کارفرما مرتبط هستند؛ خالی بودن بقیه مانع تأیید و رفتن به مرحله بعد نمی‌شود.
+          </div>
+          <div id="qa1Checklist"></div>
+        </div>
+        <div class="card half">
+          <h3>Security Gate #1 <span class="badge pending">موارد مرتبط</span></h3>
+          <div class="notice danger-note">تست نفوذ فقط روی پروژه خودتان یا با مجوز صریح کارفرما انجام شود. تست‌های مخرب، حجیم یا تخریب داده در محیط واقعی اجرا نشوند.</div>
+          <div class="notice" style="margin-bottom:12px">
+            <b>قانون Checklist:</b> این گزینه‌ها اجباری نیستند. فقط مواردی را انتخاب کن که برای پروژه و قرارداد کارفرما مرتبط هستند؛ خالی بودن بقیه مانع تأیید و رفتن به مرحله بعد نمی‌شود.
+          </div>
+          <div id="sec1Checklist" style="margin-top:12px"></div>
+        </div>
+      </div>
+    
+      <div class="wizard-action-bar" data-wizard-bar="qa1">
+        <div class="wizard-meta">
+          <b id="wizardTitle-qa1">تأیید این مرحله</b>
+          <small id="wizardHint-qa1">پس از بررسی، این مرحله را تأیید کن تا سیستم خودکار به مرحله بعد برود.</small>
+        </div>
+        <div class="wizard-actions">
+          <button class="btn secondary" onclick="showSection('dashboard', true)">بازگشت به داشبورد</button>
+          <button class="btn wizard-next" id="wizardNext-qa1" onclick="approveCurrentStageAndContinue()">تأیید مرحله و ادامه</button>
+        </div>
+      </div>
+</section>
+
+    <section id="deploy" class="section">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">STEP 08</div>
+          <h2>Preview و Deployment</h2>
+          <p>Preview، تست آنلاین و مقصد Production را مدیریت کن.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card half">
+          <h3>DashPloy Preview</h3>
+          <div class="notice">DashPloy برای Preview / Test / Demo است و در صورت نامناسب بودن Vercel می‌تواند به‌عنوان گزینه جایگزین بررسی شود.</div>
+          <div class="field" style="margin-top:12px"><label>نام پروژه DashPloy</label><input id="dashployProject" value="aria-fashion-preview"></div>
+          <div class="field"><label>Preview URL</label><input id="previewUrl" placeholder="https://..." value="https://aria-fashion-preview.dashploy.app"></div>
+          <div class="field"><label>وضعیت محدودیت</label><input value="Current known limit: 2 sites — re-check before deployment" readonly></div>
+        </div>
+        <div class="card half">
+          <h3>Production</h3>
+          <div class="field"><label>پلتفرم Production</label>
+            <select id="productionPlatform">
+              <option selected>Vercel</option><option>DashPloy</option><option>Railway</option><option>Render</option>
+              <option>Cloudflare</option><option>Hostinger</option><option>VPS</option><option>Dedicated Server</option><option>Other</option>
+            </select>
+          </div>
+          <div class="field"><label>Production URL</label><input id="productionUrl" placeholder="https://example.com" value="https://aria-fashion.example.com"></div>
+          <div class="field"><label>یادداشت Deployment</label><textarea id="deployNotes">Preview:
+DashPloy
+
+Production:
+Vercel
+
+Checklist:
+- ENV Variables
+- Database Connection
+- Auth Callback
+- Domain
+- SSL
+- CDN
+- Build Verification
+- Rollback Plan</textarea></div>
+          <div class="notice danger-note">هیچ Token، API Key یا Secret را داخل این فایل HTML ذخیره نکنید.</div>
+        </div>
+      </div>
+    
+      <div class="wizard-action-bar" data-wizard-bar="deploy">
+        <div class="wizard-meta">
+          <b id="wizardTitle-deploy">تأیید این مرحله</b>
+          <small id="wizardHint-deploy">پس از بررسی، این مرحله را تأیید کن تا سیستم خودکار به مرحله بعد برود.</small>
+        </div>
+        <div class="wizard-actions">
+          <button class="btn secondary" onclick="showSection('dashboard', true)">بازگشت به داشبورد</button>
+          <button class="btn wizard-next" id="wizardNext-deploy" onclick="approveCurrentStageAndContinue()">تأیید مرحله و ادامه</button>
+        </div>
+      </div>
+</section>
+
+    <section id="qa2" class="section">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">STEP 09</div>
+          <h2>QA بعد از انتشار</h2>
+          <p>محیط واقعی، امنیت، SEO و Performance را روی Production بررسی کن.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card third"><h3>Production QA <span class="badge pending">موارد مرتبط</span></h3><div class="notice" style="margin-bottom:12px">
+            <b>قانون Checklist:</b> این گزینه‌ها اجباری نیستند. فقط مواردی را انتخاب کن که برای پروژه و قرارداد کارفرما مرتبط هستند؛ خالی بودن بقیه مانع تأیید و رفتن به مرحله بعد نمی‌شود.
+          </div>
+          <div id="qa2Checklist"></div></div>
+        <div class="card third"><h3>Security Gate #2 <span class="badge pending">موارد مرتبط</span></h3><div class="notice" style="margin-bottom:12px">
+            <b>قانون Checklist:</b> این گزینه‌ها اجباری نیستند. فقط مواردی را انتخاب کن که برای پروژه و قرارداد کارفرما مرتبط هستند؛ خالی بودن بقیه مانع تأیید و رفتن به مرحله بعد نمی‌شود.
+          </div>
+          <div id="sec2Checklist"></div></div>
+        <div class="card third"><h3>SEO / Performance <span class="badge pending">موارد مرتبط</span></h3><div class="notice" style="margin-bottom:12px">
+            <b>قانون Checklist:</b> این گزینه‌ها اجباری نیستند. فقط مواردی را انتخاب کن که برای پروژه و قرارداد کارفرما مرتبط هستند؛ خالی بودن بقیه مانع تأیید و رفتن به مرحله بعد نمی‌شود.
+          </div>
+          <div id="seoChecklist"></div></div>
+      </div>
+    
+      <div class="wizard-action-bar" data-wizard-bar="qa2">
+        <div class="wizard-meta">
+          <b id="wizardTitle-qa2">تأیید این مرحله</b>
+          <small id="wizardHint-qa2">پس از بررسی، این مرحله را تأیید کن تا سیستم خودکار به مرحله بعد برود.</small>
+        </div>
+        <div class="wizard-actions">
+          <button class="btn secondary" onclick="showSection('dashboard', true)">بازگشت به داشبورد</button>
+          <button class="btn wizard-next" id="wizardNext-qa2" onclick="approveCurrentStageAndContinue()">تأیید مرحله و ادامه</button>
+        </div>
+      </div>
+</section>
+
+    <section id="handover" class="section">
+      <div class="section-head">
+        <div class="section-copy">
+          <div class="section-kicker">STEP 10</div>
+          <h2>تحویل پروژه</h2>
+          <p>همه چیز را برای تحویل حرفه‌ای و قابل نگهداری آماده کن.</p>
+        </div>
+        <div class="workspace-hint"><kbd>⛶</kbd><span>برای متن‌های بلند، Fullscreen Editor را باز کن.</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card half">
+          <h3>Client Handover Checklist <span class="badge pending">موارد مرتبط</span></h3>
+          <div class="notice" style="margin-bottom:12px">
+            <b>قانون Checklist:</b> این گزینه‌ها اجباری نیستند. فقط مواردی را انتخاب کن که برای پروژه و قرارداد کارفرما مرتبط هستند؛ خالی بودن بقیه مانع تأیید و رفتن به مرحله بعد نمی‌شود.
+          </div>
+          <div id="handoverChecklist"></div>
+        </div>
+        <div class="card half">
+          <h3>خلاصه تحویل</h3>
+          <div id="handoverOutput" class="output">نمونه خلاصه تحویل:
+- Production URL: https://aria-fashion.example.com
+- Admin URL: /admin
+- Repository: GitHub repository
+- Deployment: Vercel
+- Preview: DashPloy
+- Documentation: آماده
+- Security QA: پس از تست تکمیل می‌شود
+- SEO/Performance: پس از Production QA تکمیل می‌شود</div>
+          <div class="toolbar">
+            <button class="btn" onclick="generateHandover()">ساخت خلاصه تحویل</button>
+            <button class="btn secondary" onclick="copyOutput('handoverOutput')">کپی</button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="wizard-action-bar" data-wizard-bar="handover">
+        <div class="wizard-meta">
+          <b id="wizardTitle-handover">تأیید این مرحله</b>
+          <small id="wizardHint-handover">پس از بررسی، این مرحله را تأیید کن تا سیستم خودکار به مرحله بعد برود.</small>
+        </div>
+        <div class="wizard-actions">
+          <button class="btn secondary" onclick="showSection('dashboard', true)">بازگشت به داشبورد</button>
+          <button class="btn wizard-next" id="wizardNext-handover" onclick="approveCurrentStageAndContinue()">تأیید مرحله و ادامه</button>
+        </div>
+      </div>
+</section>
+
+    <div class="footer">HAFS — Single File Edition • HTML + Inline CSS + Inline JavaScript</div>
+    <div id="toast" class="toast"></div>
+
+    <div id="fullscreenEditor" class="fullscreen-editor" aria-hidden="true">
+      <div class="fs-topbar">
+        <div class="fs-title-wrap">
+          <small>FULLSCREEN EDITOR</small>
+          <b id="fullscreenTitle">ویرایش متن</b>
+        </div>
+        <div class="fs-actions">
+          <button class="btn secondary" onclick="copyFullscreenText()">کپی</button>
+          <button class="btn secondary" onclick="closeFullscreenEditor(false)">بستن</button>
+          <button class="btn ok" onclick="closeFullscreenEditor(true)">ذخیره و بستن</button>
+        </div>
+      </div>
+      <div class="fs-body">
+        <div class="fs-editor-wrap">
+          <textarea id="fullscreenTextarea" spellcheck="true"></textarea>
+          <div class="fs-footer">
+            <span>Esc = بستن • Ctrl/Cmd + Enter = ذخیره و بستن</span>
+            <span id="fullscreenCounter" class="fs-count">0 chars • 0 words</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const sections = [...document.querySelectorAll('.section')];
+const navButtons = [...document.querySelectorAll('#nav button[data-section]')];
+const titles = {
+  dashboard:'داشبورد پروژه', intake:'دریافت پروژه', interview:'مصاحبه کارفرما',
+  classification:'نوع سایت و Site DNA', scenario:'سناریو و معماری', codex:'Promptهای Codex',
+  build:'ساخت پروژه', qa1:'QA قبل از انتشار', deploy:'Preview / Deployment',
+  qa2:'QA بعد از انتشار', handover:'تحویل پروژه'
+};
+
+const workflowSteps = [
+  {section:'dashboard', no:'00', name:'داشبورد', hint:'وضعیت کلی پروژه و مسیر بعدی را بررسی کن.', gates:[]},
+  {section:'intake', no:'01', name:'دریافت پروژه', hint:'درخواست خام کارفرما، محدودیت‌ها و نیازهای اولیه را ثبت کن.', gates:['Intake']},
+  {section:'interview', no:'02', name:'مصاحبه کارفرما', hint:'سؤال‌های لازم را آماده کن و ابهام‌های کسب‌وکار را برطرف کن.', gates:['Interview']},
+  {section:'classification', no:'03', name:'نوع سایت و Site DNA', hint:'بهترین نوع پایه، ترکیب ماژول‌ها و DNA پروژه را مشخص کن.', gates:['Classification']},
+  {section:'scenario', no:'04', name:'سناریو و معماری', hint:'سناریوی کامل پروژه و Architecture Blueprint را نهایی کن.', gates:['Scenario','Architecture']},
+  {section:'codex', no:'05', name:'Promptهای Codex', hint:'Prompt Pack مرحله‌ای و کنترل‌شده برای ساخت پروژه تولید کن.', gates:['Codex Prompts']},
+  {section:'build', no:'06', name:'ساخت پروژه', hint:'ساخت را مرحله‌ای انجام بده و هر بخش را قبل از ادامه تأیید کن.', gates:['Build']},
+  {section:'qa1', no:'07', name:'QA قبل از انتشار', hint:'Functional QA و Security Gate #1 را کامل کن.', gates:['QA #1','Security #1']},
+  {section:'deploy', no:'08', name:'Preview و Deployment', hint:'Preview را بررسی کن، سپس Production را بعد از تأیید انجام بده.', gates:['Preview','Production']},
+  {section:'qa2', no:'09', name:'QA بعد از انتشار', hint:'Production QA، Security Gate #2 و SEO/Performance را کامل کن.', gates:['QA #2','Security #2','SEO/Performance']},
+  {section:'handover', no:'10', name:'تحویل پروژه', hint:'اسناد و اطلاعات تحویل را کامل و پروژه را به کارفرما تحویل بده.', gates:['Handover']}
+];
+
+const gates = ['Intake','Interview','Classification','Scenario','Architecture','Codex Prompts','Build','QA #1','Security #1','Preview','Production','QA #2','Security #2','SEO/Performance','Handover'];
+const sampleDefaultModules = ["AEO", "Accounting-lite", "Admin Dashboard", "Analytics", "Automation", "Blog", "CMS", "CRM", "Coupons", "GEO", "Inventory", "Invoices", "Marketing", "Payments", "Reports", "SEO", "SMS/Email", "Search", "Shipping", "Support", "n8n"];
+const modules = ['CMS','CRM','Inventory','Accounting-lite','Admin Dashboard','Payments','Shipping','Booking','Membership','Search','Analytics','Marketing','Automation','n8n','SMS/Email','Blog','SEO','AEO','GEO','AI Assistant','Recommendations','Support','Reports','Invoices','Suppliers','Loyalty','Coupons'];
+
+const buildItems = ['Foundation','Design System','Frontend','Database','Authentication','Core Features','Admin Panel','Business Management','Integrations','Automation','Optimization'];
+const qa1Items = ['Pages & Navigation','Forms','Authentication','Authorization','Database','APIs','Payments','Admin Panel','Responsive','Accessibility','Loading/Error/Empty States','Build','TypeScript/Lint','Console Errors','Broken Links','Edge Cases'];
+const sec1Items = ['Auth Security','Authorization / IDOR','Session Security','Input Validation','XSS','CSRF','Injection','SSRF','File Upload Security','API Security','Webhook Security','Secrets Scan','Dependency Scan','Security Headers','CORS','Rate Limiting','Controlled Pentest'];
+const qa2Items = ['Domain','DNS','HTTPS/SSL','Redirects','ENV Variables','Production DB','Storage','CDN/Cache','Auth/OAuth','API','Uploads','Payment Callback','Webhooks','Email/SMS','Mobile/Desktop/Browsers'];
+const sec2Items = ['TLS/Certificate','HSTS','CSP','CORS','Security Headers','Admin Exposure','Debug/Dev Exposure','Storage Exposure','Backup Exposure','Source Map Exposure','Session Security','Authorization','API Exposure','Rate Limiting','Information Leakage','Non-destructive Pentest'];
+const seoItems = ['robots.txt','sitemap.xml','Canonical','Metadata','Open Graph','Schema.org','Indexability','Status Codes','404','Internal Links','Search Console','Core Web Vitals','LCP','CLS','INP','Images','Fonts','Caching/CDN'];
+const handoverItems = ['Production URL','Admin URL','Repository','Credentials Transfer','Admin Guide','Architecture Summary','ENV Guide','Deployment Guide','Backup Guide','Maintenance Guide','Database Info','Third-party Services','Domain Info','Known Limitations','Future Roadmap'];
+
+const checklistSamples = {
+  build: {
+    title:'نمونه روند ساخت پروژه',
+    description:'نمونه نشان می‌دهد پروژه فرضی در میانه Build است؛ موارد سبز انجام شده‌اند و بقیه هنوز ادامه دارند.',
+    statuses:['done','done','done','done','review','pending','pending','pending','pending','pending','pending'],
+    notes:[
+      'Project structure، Git و تنظیمات اولیه آماده شده‌اند.',
+      'Design tokens، Typography، Button/Input/Card و Responsive rules ساخته شده‌اند.',
+      'صفحات اصلی و Layout اولیه پیاده‌سازی شده‌اند.',
+      'Schema اولیه PostgreSQL و Migrationها آماده هستند.',
+      'نمونه: Login/Signup ساخته شده ولی OAuth Callback هنوز باید بررسی شود.',
+      'Cart، Checkout و Order flow هنوز تکمیل نشده‌اند.',
+      'پنل Admin هنوز در صف ساخت است.',
+      'CRM-lite، Inventory و Reports هنوز شروع نشده‌اند.',
+      'Payment/SMS/Storage integrations هنوز متصل نشده‌اند.',
+      'Automation و Webhookها برای فاز بعدی هستند.',
+      'Performance pass بعد از تکمیل Featureها انجام می‌شود.'
+    ]
+  },
+  qa1: {
+    title:'نمونه QA قبل از انتشار',
+    description:'نمونه یک QA واقعی را نشان می‌دهد؛ چند تست Pass شده و چند مورد هنوز باید بررسی شود.',
+    statuses:['done','done','done','review','done','done','pending','review','done','done','done','done','done','done','pending','pending'],
+    notes:[
+      'تمام لینک‌های اصلی و Navigation بدون خطا تست شده‌اند.',
+      'Form validation و پیام‌های خطا بررسی شده‌اند.',
+      'Login/Logout و Session در محیط تست کار می‌کنند.',
+      'Role/Permission برای Staff هنوز نیازمند تست منفی است.',
+      'CRUD اصلی دیتابیس تست شده است.',
+      'APIهای اصلی Status صحیح برمی‌گردانند.',
+      'Payment sandbox هنوز تست نهایی نشده است.',
+      'Admin روی Desktop خوب است؛ Mobile table نیاز به بازبینی دارد.',
+      'Mobile/Tablet/Desktop تست شده‌اند.',
+      'Label، Focus و Contrast اولیه بررسی شده‌اند.',
+      'Loading، Empty، Error و Success states وجود دارند.',
+      'Production build بدون خطا ساخته می‌شود.',
+      'TypeScript/Lint بدون Critical Error است.',
+      'Console Critical Error مشاهده نشده است.',
+      'Broken-link scan هنوز کامل نشده است.',
+      'Network failure، duplicate submit و expired session هنوز باید تست شوند.'
+    ]
+  },
+  sec1: {
+    title:'نمونه Security Gate قبل از انتشار',
+    description:'این‌ها نمونه وضعیت یک بررسی امنیتی مجاز روی Staging هستند؛ تیک واقعی فقط پس از تست انجام شود.',
+    statuses:['done','review','done','done','done','done','done','pending','review','done','pending','done','done','done','done','review','pending'],
+    notes:[
+      'Login brute-force protection و password flow بررسی شده‌اند.',
+      'IDOR تست شده ولی چند Role edge case باقی مانده است.',
+      'Cookie flags و session expiration بررسی شده‌اند.',
+      'Server-side validation برای ورودی‌های حساس وجود دارد.',
+      'Stored/Reflected XSS تست پایه شده است.',
+      'CSRF strategy برای مسیرهای حساس بررسی شده است.',
+      'SQL/command injection مسیرهای اصلی بررسی شده‌اند.',
+      'SSRF فقط در صورت وجود URL-fetch feature باید تست شود.',
+      'Upload type/size بررسی شده؛ content validation هنوز مانده است.',
+      'API auth و response exposure بررسی شده است.',
+      'Webhook signature verification هنوز باید تست شود.',
+      'Repository/ENV برای secret leakage بررسی شده‌اند.',
+      'Dependency scan اجرا شده است.',
+      'CSP/HSTS/X-Content-Type و headers بررسی شده‌اند.',
+      'CORS فقط Originهای لازم را اجازه می‌دهد.',
+      'Rate-limit threshold نیازمند تست نهایی است.',
+      'Controlled pentest در پایان Staging انجام می‌شود.'
+    ]
+  },
+  qa2: {
+    title:'نمونه QA بعد از انتشار',
+    description:'نمونه Production QA بعد از Deploy؛ موارد محیط واقعی دوباره از صفر بررسی می‌شوند.',
+    statuses:['done','done','done','done','done','done','done','review','done','done','done','review','pending','pending','review'],
+    notes:[
+      'دامنه Production باز می‌شود.',
+      'DNS به مقصد صحیح Resolve می‌شود.',
+      'HTTPS و Certificate معتبر است.',
+      'HTTP→HTTPS و www/non-www طبق تصمیم پروژه است.',
+      'ENVهای Production بدون نمایش Secret بارگذاری شده‌اند.',
+      'Production DB connection سالم است.',
+      'Storage upload/read تست شده است.',
+      'Cache/CDN نیازمند یک دور بررسی Header و Purge است.',
+      'Login/OAuth روی URL واقعی تست شده‌اند.',
+      'APIهای Production پاسخ صحیح می‌دهند.',
+      'Upload فایل واقعی تست شده است.',
+      'Payment callback هنوز Sandbox/Low-value test می‌خواهد.',
+      'Webhook delivery باید از سرویس واقعی بررسی شود.',
+      'SMS/Email واقعی هنوز تست نشده است.',
+      'Safari/iOS و چند اندازه موبایل هنوز باید بررسی شوند.'
+    ]
+  },
+  sec2: {
+    title:'نمونه Security Gate روی Production',
+    description:'فقط بررسی‌های غیرمخرب روی Production؛ تست‌های پرریسک باید روی Staging انجام شوند.',
+    statuses:['done','done','done','done','done','done','done','review','pending','pending','done','done','done','review','done','pending'],
+    notes:[
+      'TLS و Certificate chain بررسی شده است.',
+      'HSTS فعال و مقدار آن بررسی شده است.',
+      'CSP روی Production اعمال شده است.',
+      'CORS Originها محدود هستند.',
+      'Security Headers از URL واقعی بررسی شده‌اند.',
+      'Admin route نیازمند Auth است.',
+      'Debug/dev endpoint عمومی پیدا نشده است.',
+      'Storage public/private policy نیازمند بازبینی نهایی است.',
+      'Backup URL/Artifact exposure هنوز باید بررسی شود.',
+      'Source map policy هنوز تصمیم‌گیری نشده است.',
+      'Session cookie روی Production امن است.',
+      'Role boundaries دوباره روی Production تست شده‌اند.',
+      'APIهای خصوصی بدون Auth قابل دسترس نیستند.',
+      'Rate limiting با بار کم و غیرمخرب باید تأیید شود.',
+      'Error message اطلاعات حساس نشان نمی‌دهد.',
+      'Pentest غیرمخرب نهایی هنوز انجام نشده است.'
+    ]
+  },
+  seo: {
+    title:'نمونه SEO / Performance QA',
+    description:'نمونه نشان می‌دهد بعد از انتشار چه چیزهایی باید Pass شوند و چه مواردی معمولاً نیاز به اندازه‌گیری واقعی دارند.',
+    statuses:['done','done','done','done','done','done','done','done','done','review','pending','review','pending','pending','pending','done','done','review'],
+    notes:[
+      'robots.txt در Production قابل دسترس است.',
+      'sitemap.xml ساخته و قابل خواندن است.',
+      'Canonical برای صفحات اصلی درست است.',
+      'Title/Description برای Templateهای اصلی وجود دارد.',
+      'Open Graph preview بررسی شده است.',
+      'Product/Breadcrumb/Organization schema وجود دارد.',
+      'صفحات اصلی noindex ناخواسته ندارند.',
+      '200/301/404های اصلی بررسی شده‌اند.',
+      'صفحه 404 سفارشی و سالم است.',
+      'Internal linking هنوز برای صفحات Content بازبینی می‌شود.',
+      'Search Console بعد از دامنه نهایی باید متصل شود.',
+      'CWV باید روی داده Production اندازه‌گیری شود.',
+      'LCP هنوز به عدد واقعی نیاز دارد.',
+      'CLS هنوز به عدد واقعی نیاز دارد.',
+      'INP بعد از داده کاربر/تست واقعی بررسی می‌شود.',
+      'تصاویر Responsive و optimized هستند.',
+      'Font loading و fallback بررسی شده است.',
+      'Cache/CDN headers هنوز نیازمند اندازه‌گیری نهایی هستند.'
+    ]
+  },
+  handover: {
+    title:'نمونه Checklist تحویل',
+    description:'نمونه پکیج تحویل حرفه‌ای؛ Secretها باید جدا و از مسیر امن منتقل شوند.',
+    statuses:['done','done','done','review','done','done','done','done','done','pending','done','done','done','review','pending'],
+    notes:[
+      'URL نهایی Production ثبت شده است.',
+      'Admin URL به کارفرما اعلام شده است.',
+      'Repository و سطح دسترسی مشخص است.',
+      'Credential transfer فقط از مسیر امن انجام می‌شود.',
+      'راهنمای استفاده پنل آماده شده است.',
+      'خلاصه معماری برای نگهداری آینده آماده است.',
+      'نام ENVها مستند شده‌اند؛ مقدار Secret نوشته نمی‌شود.',
+      'روش Deploy/Redeploy مستند شده است.',
+      'Backup/Restore flow نوشته شده است.',
+      'قرارداد Maintenance هنوز با کارفرما نهایی نشده است.',
+      'اطلاعات DB بدون Secret مستند شده است.',
+      'لیست سرویس‌های ثالث و مالکیت حساب‌ها مشخص است.',
+      'Domain/DNS ownership مشخص است.',
+      'Known limitations باید در جلسه تحویل مرور شوند.',
+      'Future roadmap بعد از Feedback نهایی می‌شود.'
+    ]
+  }
+};
+
+const moduleSamplePresets = {
+  ecommerce: {
+    title:'فروشگاه حرفه‌ای نمونه',
+    modules:['CMS','CRM','Inventory','Accounting-lite','Admin Dashboard','Payments','Shipping','Search','Analytics','Marketing','Automation','n8n','SMS/Email','Blog','SEO','AEO','GEO','Support','Reports','Invoices','Coupons']
+  },
+  simple: {
+    title:'فروشگاه ساده نمونه',
+    modules:['CMS','Admin Dashboard','Payments','Shipping','Search','Analytics','SEO','Reports']
+  }
+};
+
+function applyChecklistSample(key){
+  const sample=checklistSamples[key];
+  if(!sample) return;
+  sample.statuses.forEach((status,i)=>{
+    state.checks[`${key}:${i}`]=status==='done';
+  });
+  saveAll(false);
+  syncChecklistDOM(key);
+  invalidateChecklistRelatedGate(key);
+  toast('وضعیت نمونه Checklist اعمال شد. این فقط نمونه است و تأیید نهایی محسوب نمی‌شود.','ok');
+}
+
+function clearChecklistSample(key){
+  const sample=checklistSamples[key];
+  if(!sample) return;
+  sample.statuses.forEach((_,i)=>state.checks[`${key}:${i}`]=false);
+  saveAll(false);
+  syncChecklistDOM(key);
+  invalidateChecklistRelatedGate(key);
+  toast('Checklist پاک شد.');
+}
+
+function completeChecklist(key){
+  const sample=checklistSamples[key];
+  if(!sample) return;
+  sample.statuses.forEach((_,i)=>state.checks[`${key}:${i}`]=true);
+  saveAll(false);
+  syncChecklistDOM(key);
+  invalidateChecklistRelatedGate(key);
+  toast('همه موارد انتخاب شدند. این انتخاب اختیاری است و می‌توانی موارد نامرتبط را برداری.','ok');
+}
+
+function syncChecklistDOM(key){
+  document.querySelectorAll(`[data-check^="${key}:"]`).forEach(c=>{
+    c.checked=!!state.checks[c.dataset.check];
+    const idx=Number(c.dataset.check.split(':')[1]);
+    const stage=c.closest('.stage');
+    const status=checklistSamples[key]?.statuses?.[idx]||'pending';
+    if(stage){
+      stage.classList.remove('sample-done','sample-pending','sample-review');
+      stage.classList.add(`sample-${status}`);
+    }
+  });
+}
+
+function invalidateChecklistRelatedGate(key){
+  const map={
+    build:['Build'],
+    qa1:['QA #1'],
+    sec1:['Security #1'],
+    qa2:['QA #2'],
+    sec2:['Security #2'],
+    seo:['SEO/Performance'],
+    handover:['Handover']
+  };
+  (map[key]||[]).forEach(g=>invalidateGate(g,true));
+  renderStages();
+  renderApprovalBars();
+}
+
+function applyModulePreset(name){
+  const preset=moduleSamplePresets[name];
+  if(!preset) return;
+  document.querySelectorAll('[data-module]').forEach(c=>c.checked=preset.modules.includes(c.dataset.module));
+  state.modules={};
+  document.querySelectorAll('[data-module]').forEach(c=>state.modules[c.dataset.module]=c.checked);
+  invalidateSectionApprovals('classification',true);
+  saveAll(false);
+  toast(`قالب «${preset.title}» اعمال شد.`,'ok');
+}
+
+function clearModulePreset(){
+  document.querySelectorAll('[data-module]').forEach(c=>c.checked=false);
+  state.modules={};
+  invalidateSectionApprovals('classification',true);
+  saveAll(false);
+  toast('انتخاب ماژول‌ها پاک شد.');
+}
+
+const sectionGateMap = {
+  intake:['Intake'],
+  interview:['Interview'],
+  classification:['Classification'],
+  scenario:['Scenario','Architecture'],
+  codex:['Codex Prompts'],
+  build:['Build'],
+  qa1:['QA #1','Security #1'],
+  deploy:['Preview','Production'],
+  qa2:['QA #2','Security #2','SEO/Performance'],
+  handover:['Handover']
+};
+
+const gateSectionMap = {};
+Object.entries(sectionGateMap).forEach(([section, gateList]) => gateList.forEach(g => gateSectionMap[g] = section));
+
+const gateDescriptions = {
+  'Intake':'اطلاعات اولیه و درخواست خام کارفرما ثبت شده باشد.',
+  'Interview':'سناریوی مصاحبه و سؤال‌های حیاتی آماده شده باشد.',
+  'Classification':'نوع سایت، مدل سیستم و Site DNA مشخص شده باشد.',
+  'Scenario':'سناریوی کسب‌وکار، کاربران، صفحات، امکانات و طراحی مشخص شده باشد.',
+  'Architecture':'معماری فنی و الزامات عملیاتی پروژه مشخص شده باشد.',
+  'Codex Prompts':'حداقل یک Prompt اجرایی برای Codex تولید شده باشد.',
+  'Build':'تمام مراحل Build Checklist تکمیل شده باشد.',
+  'QA #1':'تمام تست‌های Pre-Deployment تکمیل شده باشند.',
+  'Security #1':'تمام موارد Security Gate قبل از انتشار بررسی شده باشند.',
+  'Preview':'نام پروژه و Preview URL ثبت شده باشند.',
+  'Production':'پلتفرم و Production URL ثبت شده باشند.',
+  'QA #2':'تمام تست‌های Production QA تکمیل شده باشند.',
+  'Security #2':'تمام موارد Security Gate تولید بررسی شده باشند.',
+  'SEO/Performance':'تمام موارد SEO / AEO / GEO و Performance بررسی شده باشند.',
+  'Handover':'Checklist تحویل کامل و خلاصه تحویل آماده شده باشد.'
+};
+
+const STORAGE_KEY = 'hafsProject_v10_full';
+const LEGACY_STORAGE_KEYS = ['hafsProject_v7_samples', 'hafsProject'];
+
+function readPersistedProjectState(){
+  const candidates=[STORAGE_KEY, ...LEGACY_STORAGE_KEYS];
+  for(const key of candidates){
+    const raw=localStorage.getItem(key);
+    if(!raw) continue;
+    try{
+      const parsed=JSON.parse(raw);
+      if(parsed && typeof parsed==='object'){
+        return {found:true, key, state:parsed};
+      }
+    }catch(e){}
+  }
+  return {found:false, key:null, state:{}};
+}
+
+const persistedProject = readPersistedProjectState();
+let state = persistedProject.state || {};
+const hasPersistedProject = persistedProject.found;
+
+state.approved = state.approved || {};
+state.approvedAt = state.approvedAt || {};
+state.checks = state.checks || {};
+state.modules = state.modules || {};
+state.generatedOutputs = state.generatedOutputs || {};
+state.activeSection = state.activeSection || 'dashboard';
+
+// Sample defaults are injected ONLY for a truly new project.
+// An imported/saved project with zero selected checkboxes/modules stays zero.
+if(!hasPersistedProject){
+  ['build','qa1','sec1','qa2','sec2','seo','handover'].forEach(key=>{
+    const sample=checklistSamples[key];
+    if(sample){
+      sample.statuses.forEach((status,i)=>state.checks[`${key}:${i}`]=status==='done');
+    }
+  });
+  sampleDefaultModules.forEach(m=>state.modules[m]=true);
+}
+
+function $(id){ return document.getElementById(id); }
+
+const fieldTemplates = {
+  "clientRaw": "نمونه:\nکارفرما گفت یک سایت فروشگاهی ساده برای فروش لباس می‌خواهد. سایت باید فارسی و RTL باشد، روی موبایل خوب نمایش داده شود و امکان مدیریت محصولات و سفارش‌ها را داشته باشد. هنوز درباره درگاه پرداخت، روش ارسال، تعداد محصولات و پنل مدیریت جزئیات نداده است.",
+  "constraints": "نمونه:\nبودجه تقریبی: نامشخص\nزمان تحویل: 3 تا 4 هفته\nبازار هدف: ایران\nمحدودیت‌ها:\n- هزینه سرویس‌های جانبی پایین باشد\n- مدیریت سایت برای کارفرما ساده باشد\n- در صورت امکان Production روی Vercel\n- Preview/Test روی DashPloy",
+  "knownReq": "نمونه:\n- فروشگاه اینترنتی\n- زبان فارسی و RTL\n- طراحی Responsive\n- پنل مدیریت\n- مدیریت محصول\n- مدیریت سفارش\n- تجربه کاربری ساده",
+  "recommendations": "نمونه:\n- جستجو و فیلتر محصولات\n- مدیریت موجودی\n- CRM سبک\n- گزارش فروش\n- تخفیف و کوپن\n- SEO پایه\n- Analytics\n- پیامک یا ایمیل وضعیت سفارش",
+  "assumptions": "نمونه:\n- فعلاً پروژه B2C در نظر گرفته می‌شود\n- یک مدیر اصلی برای پنل وجود دارد\n- موجودی محصولات از داخل پنل مدیریت می‌شود\n- اپ موبایل در فاز اول نیاز نیست",
+  "clientDecisions": "نمونه:\n- درگاه پرداخت کدام است؟\n- روش ارسال چیست؟\n- چند محصول در شروع وجود دارد؟\n- آیا محصولات Variant دارند؟\n- آیا فاکتور رسمی نیاز است؟\n- آیا اتصال به نرم‌افزار حسابداری وجود دارد؟",
+  "criticalQuestions": "نمونه:\n1) هدف اصلی سایت چیست؟\n2) چه محصول یا خدماتی می‌فروشید؟\n3) کاربران اصلی چه کسانی هستند؟\n4) خرید آنلاین کامل می‌خواهید یا فقط نمایش محصول؟\n5) درگاه پرداخت مشخص است؟\n6) روش ارسال چگونه است؟\n7) پنل مدیریت چه بخش‌هایی باید داشته باشد؟",
+  "importantQuestions": "نمونه:\n1) آیا برند، لوگو و رنگ سازمانی دارید؟\n2) آیا نمونه سایت مورد علاقه دارید؟\n3) آیا به جستجو و فیلتر پیشرفته نیاز دارید؟\n4) آیا مدیریت موجودی و انبار لازم است؟\n5) آیا پیامک سفارش و اعلان لازم است؟\n6) آیا SEO برایتان اهمیت دارد؟",
+  "optionalQuestions": "نمونه:\n1) قابلیت‌های آینده‌ای که ممکن است بعداً اضافه شوند چیست؟\n2) آیا اتصال به شبکه‌های اجتماعی یا ابزارهای خارجی نیاز دارید؟\n3) آیا چندزبانه بودن یا اپ موبایل در آینده مطرح است؟\n4) آیا ترجیح خاصی برای هاست یا سرویس‌های پرداخت دارید؟",
+  "technicalDecisions": "نمونه:\n- Frontend: Next.js + TypeScript\n- Styling: Tailwind CSS\n- Database: PostgreSQL\n- Auth: Supabase Auth\n- Storage: Supabase Storage / Cloudinary\n- Preview: DashPloy\n- Production: Vercel در صورت سازگاری\n- Architecture: Modular, maintainable, scalable",
+  "siteDna": "BASE\nE-Commerce\n\nBUSINESS\nB2C\n\nSYSTEM\nWebsite + Internal Business Management System\n\nCOMMERCE\nProducts\nOrders\nInventory\nPayments\n\nMANAGEMENT\nAdmin Dashboard\nCRM\nAccounting-lite\n\nCONTENT\nCMS\nBlog\n\nGROWTH\nSEO\nCoupons\nAnalytics\n\nAUTOMATION\nSMS\nEmail\nn8n\n\nDEPLOYMENT\nDashPloy Preview\nVercel Production",
+  "businessScenario": "نمونه:\nهدف پروژه:\nساخت یک فروشگاه آنلاین ساده، سریع و قابل مدیریت برای فروش مستقیم محصولات.\n\nمدل کسب‌وکار:\nB2C\n\nمخاطب:\nمشتریان داخل ایران، عمدتاً کاربران موبایل.\n\nهدف اصلی کاربر:\nپیدا کردن محصول، بررسی جزئیات و خرید سریع.\n\nهدف کسب‌وکار:\nافزایش فروش، مدیریت ساده سفارش‌ها و کاهش کار دستی.",
+  "userScenario": "نمونه:\nنقش‌ها:\n1) Guest\n2) Customer\n3) Admin\n\nUser Journey:\nGuest → Home → Category → Product → Cart → Login/Signup → Checkout → Payment → Order Confirmation\n\nAdmin Journey:\nLogin → Dashboard → Products / Orders / Customers / Reports",
+  "pagesScenario": "نمونه:\nPublic:\n- Home\n- Shop\n- Categories\n- Product Detail\n- Search\n- About\n- Contact\n- FAQ\n\nAuth:\n- Login\n- Signup\n- Forgot Password\n\nCustomer:\n- Dashboard\n- Orders\n- Profile\n- Addresses\n\nAdmin:\n- Dashboard\n- Products\n- Orders\n- Customers\n- Inventory\n- Reports\n- Settings",
+  "featureScenario": "نمونه:\nRequired:\n- Product Management\n- Cart\n- Checkout\n- Orders\n- Payment\n- Admin Dashboard\n\nRecommended:\n- Inventory\n- Search\n- Filters\n- Coupons\n- Analytics\n- CRM-lite\n\nOptional:\n- Loyalty\n- Referral\n- Wishlist\n\nFuture:\n- AI Assistant\n- Recommendations",
+  "designScenario": "نمونه:\nStyle:\nModern / Minimal / Clean\n\nUX:\n- Mobile-first\n- RTL\n- ساده و سریع\n- Navigation واضح\n- Checkout کوتاه\n\nDesign System:\n- 8px spacing system\n- Radius متوسط\n- Typography خوانا\n- Component states کامل\n- Loading / Empty / Error States\n\nAccessibility:\n- Contrast مناسب\n- Keyboard navigation\n- Label برای فرم‌ها",
+  "architectureScenario": "نمونه:\nFrontend:\nNext.js + TypeScript + Tailwind\n\nBackend:\nNext.js Server Actions / Route Handlers\n\nDatabase:\nPostgreSQL\n\nAuth:\nSupabase Auth\n\nStorage:\nSupabase Storage\n\nArchitecture:\nModular Feature-Based Structure\n\nDeployment:\nDashPloy Preview\nVercel Production\n\nPrinciples:\n- Maintainable\n- Secure\n- Scalable\n- Minimal vendor lock-in",
+  "seoScenario": "نمونه:\nSEO:\n- Metadata\n- Canonical\n- Sitemap\n- robots.txt\n- Product Schema\n- Breadcrumb Schema\n- Open Graph\n- Internal Linking\n\nAEO:\n- FAQ structure\n- Clear question/answer sections\n\nGEO:\n- Structured factual content\n- Entity-rich pages\n- Clear summaries",
+  "opsScenario": "نمونه:\nSecurity:\n- Auth/Authorization\n- Rate Limiting\n- Input Validation\n- Secure Cookies\n- Security Headers\n- Secret Scanning\n- Dependency Scan\n- Authorized Pentest\n\nPerformance:\n- Image Optimization\n- Lazy Loading\n- Caching\n- Core Web Vitals\n\nMonitoring:\n- Uptime\n- Error Logs\n- Analytics\n- Security Events",
+  "deployNotes": "نمونه:\nPreview:\nDashPloy\n\nProduction:\nVercel\n\nChecklist:\n- ENV Variables\n- Database Connection\n- Auth Callback\n- Domain\n- SSL\n- CDN\n- Build Verification\n- Rollback Plan"
+};
+
+const fieldPlaceholders = {
+  "projectName": "مثلاً فروشگاه آنلاین پوشاک آریا",
+  "clientName": "مثلاً شرکت آریا استایل",
+  "clientRaw": "هر چیزی که کارفرما گفته را بدون بازنویسی اینجا وارد کن…",
+  "constraints": "بودجه، زمان، بازار هدف، سرویس‌های اجباری یا محدودیت‌ها…",
+  "knownReq": "فقط مواردی که واقعاً از حرف کارفرما قطعی هستند…",
+  "recommendations": "پیشنهادهای حرفه‌ای ما برای بهتر شدن پروژه…",
+  "assumptions": "فرض‌های موقت که هنوز از کارفرما تأیید نشده‌اند…",
+  "clientDecisions": "مواردی که فقط کارفرما باید درباره‌شان تصمیم بگیرد…",
+  "criticalQuestions": "سؤال‌هایی که بدون پاسخ آن‌ها نمی‌توان طراحی درست انجام داد…",
+  "importantQuestions": "سؤال‌هایی که کیفیت سناریو را بهتر می‌کنند…",
+  "optionalQuestions": "سؤال‌های غیرضروری ولی مفید…",
+  "technicalDecisions": "تصمیم‌هایی که تیم فنی باید بگیرد، نه کارفرما…",
+  "siteDna": "ساختار پروژه را به صورت Base / Business / Modules / Deployment بنویس…",
+  "businessScenario": "هدف پروژه، مدل کسب‌وکار، مخاطب و معیار موفقیت…",
+  "userScenario": "Roleها، Permissionها و User Journeyها…",
+  "pagesScenario": "صفحات Public / Auth / User / Admin / Legal / Error…",
+  "featureScenario": "Required / Recommended / Optional / Future…",
+  "designScenario": "Style، Design System، Responsive، Accessibility و UX…",
+  "architectureScenario": "Frontend / Backend / DB / Auth / API / Storage / Deployment…",
+  "seoScenario": "SEO / AEO / GEO و Technical SEO…",
+  "opsScenario": "Security / Performance / Monitoring / Backup / Logs…",
+  "dashployProject": "مثلاً aria-fashion-preview",
+  "previewUrl": "مثلاً https://aria-fashion-preview.dashploy.app",
+  "productionUrl": "مثلاً https://aria-fashion.com",
+  "deployNotes": "ENV، Domain، SSL، Callbackها، Rollback و نکات Deployment…"
+};
+
+
+function insertTemplate(id){
+  const el=$(id);
+  if(!el) return;
+  const template=fieldTemplates[id];
+  if(!template) return;
+
+  if(el.value.trim()){
+    const ok=confirm('این فیلد از قبل محتوا دارد. قالب نمونه جایگزین شود؟');
+    if(!ok) return;
+  }
+
+  el.value=template;
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+  el.dispatchEvent(new Event('change',{bubbles:true}));
+  updateFieldCounter(el);
+  saveAll(false);
+  toast('قالب نمونه درج شد.','ok');
+}
+
+function applySmartPlaceholders(){
+  Object.entries(fieldPlaceholders).forEach(([id,text])=>{
+    const el=$(id);
+    if(el) el.placeholder=text;
+  });
+}
+let activeEditorId = null;
+let fullscreenDirty = false;
+
+function fieldLabelFor(el){
+  const field=el.closest('.field');
+  const label=field?.querySelector('label');
+  return (label?.childNodes?.[0]?.textContent || label?.textContent || el.id || 'ویرایش متن').trim();
+}
+
+function countText(text){
+  const chars=text.length;
+  const words=(text.trim().match(/\S+/g)||[]).length;
+  return {chars,words};
+}
+
+function updateFieldCounter(el){
+  const meta=el.closest('.field')?.querySelector('.editor-meta .counter');
+  if(!meta) return;
+  const c=countText(el.value||'');
+  meta.textContent=`${c.chars} chars • ${c.words} words`;
+}
+
+function enhanceTextareas(){
+  document.querySelectorAll('textarea[id]').forEach(el=>{
+    if(el.id==='fullscreenTextarea') return;
+    const field=el.closest('.field');
+    if(!field || field.dataset.editorEnhanced==='1') return;
+    field.dataset.editorEnhanced='1';
+
+    el.classList.add('has-tools');
+    if(['clientRaw','businessScenario','userScenario','pagesScenario','featureScenario','designScenario','architectureScenario','opsScenario','siteDna'].includes(el.id)){
+      el.classList.add('editor-large');
+    }
+
+    const tools=document.createElement('div');
+    tools.className='field-tools';
+    const hasTemplate=!!fieldTemplates[el.id];
+    tools.innerHTML=`
+      <button type="button" class="icon-btn" title="تمام صفحه" aria-label="تمام صفحه" onclick="openFullscreenEditor('${el.id}')">⛶</button>
+      <button type="button" class="icon-btn" title="کپی" aria-label="کپی" onclick="copyText('${el.id}')">⧉</button>
+      ${hasTemplate?`<button type="button" class="icon-btn" title="درج قالب نمونه" aria-label="درج قالب نمونه" onclick="insertTemplate('${el.id}')">▤</button>`:''}
+    `;
+    field.appendChild(tools);
+
+    const meta=document.createElement('div');
+    meta.className='editor-meta';
+    meta.innerHTML=`<span>${fieldTemplates[el.id]?'▤ قالب نمونه آماده است • ':''}برای نوشتن و بررسی متن‌های بلند از حالت تمام‌صفحه استفاده کن.</span><span class="counter">0 chars • 0 words</span>`;
+    field.appendChild(meta);
+    updateFieldCounter(el);
+  });
+}
+
+function openFullscreenEditor(id){
+  const source=$(id);
+  if(!source) return;
+  activeEditorId=id;
+  fullscreenDirty=false;
+  $('fullscreenTitle').textContent=fieldLabelFor(source);
+  $('fullscreenTextarea').value=source.value||'';
+  $('fullscreenEditor').classList.add('open');
+  $('fullscreenEditor').setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+  updateFullscreenCounter();
+  setTimeout(()=>$('fullscreenTextarea').focus(),50);
+}
+
+function closeFullscreenEditor(saveChanges){
+  if(!activeEditorId){
+    $('fullscreenEditor').classList.remove('open');
+    document.body.style.overflow='';
+    return;
+  }
+  const source=$(activeEditorId);
+  if(saveChanges && source){
+    source.value=$('fullscreenTextarea').value;
+    source.dispatchEvent(new Event('input',{bubbles:true}));
+    source.dispatchEvent(new Event('change',{bubbles:true}));
+    updateFieldCounter(source);
+    saveAll(false);
+    toast('متن ذخیره شد.','ok');
+  }else if(fullscreenDirty){
+    const discard=confirm('تغییرات ذخیره‌نشده در ادیتور تمام‌صفحه وجود دارد. بدون ذخیره بسته شود؟');
+    if(!discard) return;
+  }
+  $('fullscreenEditor').classList.remove('open');
+  $('fullscreenEditor').setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+  activeEditorId=null;
+  fullscreenDirty=false;
+}
+
+function updateFullscreenCounter(){
+  const c=countText($('fullscreenTextarea').value||'');
+  $('fullscreenCounter').textContent=`${c.chars} chars • ${c.words} words`;
+}
+
+function copyFullscreenText(){
+  navigator.clipboard.writeText($('fullscreenTextarea').value||'');
+  toast('متن کپی شد.','ok');
+}
+
+function toggleFocusMode(){
+  document.body.classList.toggle('focus-mode');
+  toast(document.body.classList.contains('focus-mode')?'حالت تمرکز فعال شد.':'حالت تمرکز بسته شد.');
+}
+
+function setSaveStatus(status){
+  const dot=$('saveDot'), text=$('saveText');
+  if(!dot||!text) return;
+  dot.className='save-dot '+status;
+  text.textContent=status==='saving'?'در حال ذخیره…':'ذخیره شده';
+}
+
+function toast(message, type=''){
+  const el=$('toast');
+  el.textContent=message;
+  el.className='toast show '+type;
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer=setTimeout(()=>el.className='toast',2600);
+}
+
+function isFilled(id){
+  const el=$(id);
+  return !!(el && String(el.value||'').trim());
+}
+
+function checklistComplete(prefix, items){
+  return items.every((_,i)=>!!state.checks?.[`${prefix}:${i}`]);
+}
+
+function gateValidation(gate){
+  switch(gate){
+    case 'Intake':
+      return {ok:isFilled('clientRaw'), message:'ابتدا درخواست یا توضیحات خام کارفرما را در بخش «اطلاعات خام کارفرما» وارد کنید.'};
+    case 'Interview':
+      return {ok:isFilled('criticalQuestions'), message:'ابتدا سؤال‌های حیاتی مصاحبه را آماده کنید.'};
+    case 'Classification':
+      return {ok:isFilled('siteDna'), message:'ابتدا Site DNA را بسازید یا تکمیل کنید.'};
+    case 'Scenario':
+      return {
+        ok:['businessScenario','userScenario','pagesScenario','featureScenario','designScenario'].every(isFilled),
+        message:'برای تأیید Scenario باید هدف کسب‌وکار، کاربران، صفحات، قابلیت‌ها و UI/UX تکمیل شوند.'
+      };
+    case 'Architecture':
+      return {
+        ok:isFilled('architectureScenario') && isFilled('opsScenario'),
+        message:'برای تأیید Architecture باید معماری فنی و Security/Performance/Monitoring تکمیل شوند.'
+      };
+    case 'Codex Prompts':
+      return {ok:!!$('codexOutput')?.textContent.trim(), message:'ابتدا حداقل یک Codex Prompt تولید کنید.'};
+    case 'Build':
+      return {ok:true, message:''};
+    case 'QA #1':
+      return {ok:true, message:''};
+    case 'Security #1':
+      return {ok:true, message:''};
+    case 'Preview':
+      return {ok:isFilled('dashployProject') && isFilled('previewUrl'), message:'نام پروژه DashPloy و Preview URL را وارد کنید.'};
+    case 'Production':
+      return {ok:isFilled('productionPlatform') && isFilled('productionUrl'), message:'پلتفرم و Production URL را ثبت کنید.'};
+    case 'QA #2':
+      return {ok:true, message:''};
+    case 'Security #2':
+      return {ok:true, message:''};
+    case 'SEO/Performance':
+      return {ok:true, message:''};
+    case 'Handover':
+      return {
+        ok:true,
+        message:''
+      };
+    default:
+      return {ok:true,message:''};
+  }
+}
+
+function approvalButtonHTML(gate){
+  const ok=!!state.approved[gate];
+  const approvedAt=state.approvedAt?.[gate];
+  const timeText=approvedAt ? ` • ${new Date(approvedAt).toLocaleString('fa-IR')}` : '';
+  return `<div class="approval-info">
+      <b>${ok?'✅ تأیید شده':'⏳ در انتظار تأیید'} — ${gate}</b>
+      <small>${gateDescriptions[gate]||''}${ok?timeText:''}</small>
+    </div>
+    <div class="approval-actions">
+      <button class="btn ${ok?'approved-btn':'pending-btn'}" onclick="approveGateFromPage('${gate}')">
+        ${ok?'لغو تأیید':'تأیید این بخش'}
+      </button>
+    </div>`;
+}
+
+function installApprovalBars(){
+  Object.entries(sectionGateMap).forEach(([sectionId, gateList])=>{
+    const section=$(sectionId);
+    if(!section) return;
+    let bar=section.querySelector('.approval-bar');
+    if(!bar){
+      bar=document.createElement('div');
+      bar.className='approval-bar';
+      section.appendChild(bar);
+    }
+    bar.dataset.sectionApproval=sectionId;
+  });
+  renderApprovalBars();
+}
+
+function renderApprovalBars(){
+  Object.entries(sectionGateMap).forEach(([sectionId, gateList])=>{
+    const bar=document.querySelector(`[data-section-approval="${sectionId}"]`);
+    if(!bar) return;
+    bar.innerHTML=gateList.map(g=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex:1 1 100%;flex-wrap:wrap">${approvalButtonHTML(g)}</div>`).join('<div style="height:1px;background:var(--line);width:100%"></div>');
+  });
+}
+
+function approveGateFromPage(gate){
+  if(state.approved[gate]){
+    state.approved[gate]=false;
+    delete state.approvedAt[gate];
+    saveAll(false);
+    renderStages();
+    renderApprovalBars();
+    toast(`تأیید «${gate}» لغو شد.`);
+    return;
+  }
+
+  saveAll(false);
+  const validation=gateValidation(gate);
+  if(!validation.ok){
+    toast(validation.message,'error');
+    return;
+  }
+
+  state.approved[gate]=true;
+  state.approvedAt[gate]=new Date().toISOString();
+  saveAll(false);
+  renderStages();
+  renderApprovalBars();
+  toast(`«${gate}» تأیید شد و داشبورد به‌روزرسانی شد.`,'ok');
+}
+
+function invalidateGate(gate, silent=false){
+  if(!state.approved[gate]) return false;
+  state.approved[gate]=false;
+  delete state.approvedAt[gate];
+  if(!silent) toast(`به‌دلیل تغییر اطلاعات، تأیید «${gate}» لغو شد.`);
+  return true;
+}
+
+function invalidateSectionApprovals(sectionId, silent=false){
+  const gateList=sectionGateMap[sectionId]||[];
+  let changed=false;
+  gateList.forEach(g=>{ if(invalidateGate(g,true)) changed=true; });
+  if(changed){
+    saveAll(false);
+    renderStages();
+    renderApprovalBars();
+    if(!silent) toast('اطلاعات این صفحه تغییر کرد؛ تأیید قبلی برای جلوگیری از وضعیت اشتباه لغو شد.');
+  }
+}
+
+function dashboardToggleGate(gate){
+  if(state.approved[gate]){
+    state.approved[gate]=false;
+    delete state.approvedAt[gate];
+    saveAll(false);
+    renderStages();
+    renderApprovalBars();
+    toast(`تأیید «${gate}» لغو شد.`);
+    return;
+  }
+  const sectionId=gateSectionMap[gate];
+  if(sectionId && state.activeSection!==sectionId){
+    // Validation can still use current saved DOM data.
+  }
+  approveGateFromPage(gate);
+}
+
+
+
+function currentWorkflowStep(){
+  return stepBySection(state.activeSection) || workflowSteps[0];
+}
+
+function firstIncompleteIndex(){
+  const idx = workflowSteps.slice(1).findIndex(s=>!stepApproved(s));
+  return idx === -1 ? workflowSteps.length - 1 : idx + 1;
+}
+
+function firstIncompleteStepStrict(){
+  return workflowSteps[firstIncompleteIndex()];
+}
+
+function isProjectStarted(){
+  return workflowSteps.slice(1).some(s=>s.gates.some(g=>state.approved[g])) ||
+         !!String(state.clientRaw||'').trim() ||
+         !!String(state.projectName||'').trim();
+}
+
+
+function clearAllSampleFields(){
+  const ok=confirm('همه متن‌های نمونه از کادرها پاک شوند؟');
+  if(!ok) return;
+
+  const keepSelects=['projectStatus','baseType','projectLevel','systemType','codexPhase','productionPlatform'];
+  allInputs().forEach(el=>{
+    if(el.tagName==='SELECT'){
+      if(!keepSelects.includes(el.id)) el.selectedIndex=0;
+    }else{
+      el.value='';
+    }
+  });
+
+  document.querySelectorAll('textarea[id]').forEach(updateFieldCounter);
+  state={approved:{},approvedAt:{},checks:{},activeSection:'dashboard',modules:{}};
+  localStorage.removeItem(STORAGE_KEY); LEGACY_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));
+  saveAll(false);
+  renderStages();
+  updateWorkflowMenu();
+  updateDashboardCTA();
+  toast('متن‌های نمونه پاک شدند. حالا اطلاعات پروژه واقعی را وارد کن.','ok');
+}
+
+function startOrContinueProject(){
+  const next=firstIncompleteStepStrict();
+  if(!next){
+    toast('همه مراحل اصلی پروژه تکمیل شده‌اند.','ok');
+    return;
+  }
+  showSection(next.section, true);
+}
+
+function validateWholeStep(step){
+  const failures=[];
+  step.gates.forEach(g=>{
+    const v=gateValidation(g);
+    if(!v.ok) failures.push(v.message);
+  });
+  return {ok:failures.length===0, message:failures[0]||''};
+}
+
+function approveWholeStep(step){
+  step.gates.forEach(g=>{
+    state.approved[g]=true;
+    state.approvedAt[g]=new Date().toISOString();
+  });
+  saveAll(false);
+  renderStages();
+  renderApprovalBars();
+  updateWorkflowMenu();
+}
+
+function approveCurrentStageAndContinue(){
+  const step=currentWorkflowStep();
+  if(!step || step.section==='dashboard') return;
+
+  saveAll(false);
+  const validation=validateWholeStep(step);
+  if(!validation.ok){
+    toast(validation.message,'error');
+    return;
+  }
+
+  approveWholeStep(step);
+  toast(`مرحله ${step.no} — ${step.name} تأیید شد.`,'ok');
+
+  const idx=workflowSteps.findIndex(s=>s.section===step.section);
+  if(idx<workflowSteps.length-1){
+    const next=workflowSteps[idx+1];
+    setTimeout(()=>showSection(next.section, true),250);
+  }else{
+    setTimeout(()=>showSection('dashboard', true),250);
+  }
+}
+
+function updateDashboardCTA(){
+  const next=firstIncompleteStepStrict();
+  const started=isProjectStarted();
+  const allDone=workflowSteps.slice(1).every(stepApproved);
+
+  if($('dashboardCtaTitle')){
+    $('dashboardCtaTitle').textContent = allDone ? 'پروژه آماده تحویل نهایی است' : (started ? 'ادامه پروژه' : 'شروع پروژه');
+  }
+  if($('dashboardCtaText')){
+    $('dashboardCtaText').textContent = allDone
+      ? 'تمام مراحل اصلی تأیید شده‌اند. می‌توانی وضعیت نهایی و تحویل را بررسی کنی.'
+      : `مرحله بعدی: ${next.no} — ${next.name}. سیستم پس از تأیید هر مرحله خودکار به مرحله بعد می‌رود.`;
+  }
+  if($('dashboardContinueBtn')){
+    $('dashboardContinueBtn').textContent = allDone ? 'مشاهده تحویل پروژه' : (started ? 'ادامه پروژه' : 'شروع پروژه');
+    $('dashboardContinueBtn').onclick = allDone
+      ? ()=>showSection('handover', true)
+      : startOrContinueProject;
+  }
+  if($('dashboardNextBadge')){
+    $('dashboardNextBadge').textContent = allDone ? 'Completed' : `مرحله ${next.no}`;
+    $('dashboardNextBadge').className = `badge ${allDone?'ok':'pending'}`;
+  }
+}
+
+function updateWizardActionBar(){
+  const step=currentWorkflowStep();
+  if(!step || step.section==='dashboard') return;
+  const title=$(`wizardTitle-${step.section}`);
+  const hint=$(`wizardHint-${step.section}`);
+  const btn=$(`wizardNext-${step.section}`);
+
+  if(title) title.textContent=`مرحله ${step.no} — ${step.name}`;
+  if(hint) hint.textContent=step.hint;
+
+  const approved=stepApproved(step);
+  if(btn){
+    if(approved){
+      btn.textContent='مرحله تأیید شده — ادامه';
+      btn.classList.add('wizard-disabled');
+    }else{
+      btn.textContent='تأیید مرحله و ادامه';
+      btn.classList.remove('wizard-disabled');
+    }
+  }
+}
+function stepBySection(sectionId){
+  return workflowSteps.find(s=>s.section===sectionId);
+}
+
+function stepApproved(step){
+  if(!step || step.section==='dashboard') return false;
+  return step.gates.length>0 && step.gates.every(g=>!!state.approved[g]);
+}
+
+function priorStepsApproved(step){
+  if(!step || step.section==='dashboard' || step.no==='01') return true;
+  const idx=workflowSteps.findIndex(s=>s.section===step.section);
+  const previous=workflowSteps.slice(1,idx);
+  return previous.every(s=>stepApproved(s));
+}
+
+function firstIncompleteStep(){
+  return workflowSteps.slice(1).find(s=>!stepApproved(s)) || workflowSteps[workflowSteps.length-1];
+}
+
+function updateWorkflowMenu(){
+  const current=stepBySection(state.activeSection)||workflowSteps[0];
+
+  navButtons.forEach(btn=>{
+    const step=stepBySection(btn.dataset.section);
+    if(!step) return;
+
+    btn.classList.remove('step-approved','step-active','step-locked','step-clickable');
+
+    const approved=stepApproved(step);
+    const currentAllowed=firstIncompleteStepStrict();
+    const isCurrentAllowed=currentAllowed && currentAllowed.section===step.section;
+
+    if(approved) btn.classList.add('step-approved','step-clickable');
+    if(step.section===state.activeSection) btn.classList.add('step-active');
+    if(step.section==='dashboard' || isCurrentAllowed) btn.classList.add('step-clickable');
+    if(step.section!=='dashboard' && !approved && !isCurrentAllowed) btn.classList.add('step-locked');
+
+    btn.title = approved
+      ? 'این مرحله تأیید شده است.'
+      : isCurrentAllowed
+        ? 'مرحله فعلی پروژه.'
+        : 'این مرحله تا تکمیل مراحل قبلی قفل است.';
+  });
+
+  const next=firstIncompleteStep();
+  const projectName=(state.projectName||$('projectName')?.value||'پروژه جدید').trim() || 'پروژه جدید';
+  if($('workflowProjectName')) $('workflowProjectName').textContent=projectName;
+  if($('workflowNextText')) $('workflowNextText').textContent=next ? `مرحله بعدی: ${next.no} — ${next.name}` : 'تمام مراحل اصلی تکمیل شده‌اند.';
+
+  if($('currentStepNumber')) $('currentStepNumber').textContent=current.no;
+  if($('currentStepName')) $('currentStepName').textContent=current.name;
+  if($('currentStepHint')) $('currentStepHint').textContent=current.hint;
+
+  if($('currentStepStatus')){
+    const approved=stepApproved(current);
+    const locked=current.section!=='dashboard' && !priorStepsApproved(current) && !approved;
+    $('currentStepStatus').textContent=approved?'Approved':locked?'Locked':'Active';
+    $('currentStepStatus').className=`badge ${approved?'ok':'pending'}`;
+  }
+}
+
+function canOpenSection(sectionId){
+  const step=stepBySection(sectionId);
+  if(!step || sectionId==='dashboard') return true;
+  if(stepApproved(step)) return true;
+  return priorStepsApproved(step);
+}
+
+function showSection(id, force=false){
+  const step=stepBySection(id);
+
+  if(id!=='dashboard' && !force){
+    const currentAllowed=firstIncompleteStepStrict();
+    const approved=stepApproved(step);
+    if(!approved && currentAllowed && step.section!==currentAllowed.section){
+      toast(`برای حفظ ترتیب پروژه، ابتدا مرحله ${currentAllowed.no} — ${currentAllowed.name} را انجام بده.`,'error');
+      return;
+    }
+  }
+
+  sections.forEach(s=>s.classList.toggle('active',s.id===id));
+  navButtons.forEach(b=>b.classList.toggle('active',b.dataset.section===id));
+  $('pageTitle').textContent=titles[id]||id;
+  state.activeSection=id;
+  saveAll(false);
+  window.scrollTo({top:0,behavior:'smooth'});
+  updateWorkflowMenu();
+  updateDashboardCTA();
+  updateWizardActionBar();
+enhanceTextareas();
+}
+
+navButtons.forEach(btn=>btn.addEventListener('click',()=>{
+  const sectionId=btn.dataset.section;
+  if(sectionId==='dashboard'){
+    showSection('dashboard', true);
+    return;
+  }
+  const step=stepBySection(sectionId);
+  const current=firstIncompleteStepStrict();
+  if(stepApproved(step) || (current && current.section===sectionId)){
+    showSection(sectionId, true);
+  }else{
+    toast(`این سیستم مرحله‌به‌مرحله است. ابتدا مرحله ${current.no} — ${current.name} را انجام بده.`,'error');
+  }
+}));
+
+function renderModules(){
+  $('moduleChips').innerHTML=`
+    <div class="module-template-wrap">
+      <div class="checklist-template-bar">
+        <div class="sample-copy">
+          <b>قالب نمونه انتخاب ماژول‌ها</b>
+          <small>برای دیدن یک ترکیب واقعی، Preset نمونه را اعمال کن و بعد براساس پروژه تغییرش بده.</small>
+        </div>
+        <div class="checklist-template-actions">
+          <button type="button" class="template-btn" onclick="applyModulePreset('ecommerce')">نمونه حرفه‌ای</button>
+          <button type="button" class="template-btn" onclick="applyModulePreset('simple')">نمونه ساده</button>
+          <button type="button" class="mini-action" onclick="clearModulePreset()">پاک کردن</button>
+        </div>
+      </div>
+    </div>
+    ${modules.map(m=>`<label class="chip"><input type="checkbox" data-module="${m}"> ${m}</label>`).join('')}
+  `;
+}
+
+function renderChecklist(target, items, key){
+  const sample=checklistSamples[key];
+  const toolbar=sample ? `
+    <div class="checklist-template-bar">
+      <div class="sample-copy">
+        <b>${sample.title}</b>
+        <small>${sample.description}</small>
+        <small style="display:block;margin-top:5px;color:#9eacd0">اختیاری: فقط موارد مرتبط با پروژه را تیک بزن. هیچ Checklistای شرط رفتن به مرحله بعد نیست.</small>
+      </div>
+      <div class="checklist-template-actions">
+        <button type="button" class="template-btn" onclick="applyChecklistSample('${key}')">اعمال نمونه</button>
+        <button type="button" class="mini-action" onclick="completeChecklist('${key}')">انتخاب همه</button>
+        <button type="button" class="mini-action" onclick="clearChecklistSample('${key}')">پاک کردن</button>
+      </div>
+    </div>` : '';
+
+  $(target).innerHTML=toolbar + items.map((item,i)=>{
+    const status=sample?.statuses?.[i]||'pending';
+    const statusText=status==='done'?'نمونه: انتخاب شده':status==='review'?'نمونه: قابل بررسی':'نمونه: انتخاب نشده';
+    const note=sample?.notes?.[i]||'فقط اگر این مورد برای پروژه مرتبط است آن را انتخاب کن؛ خالی ماندن آن مانع ادامه نیست.';
+    return `
+      <label class="stage sample-${status}">
+        <input type="checkbox" data-check="${key}:${i}" style="width:auto;margin-top:7px">
+        <div class="meta">
+          <b>${item}<span class="sample-status ${status}">${statusText}</span></b>
+          <small>فقط اگر این مورد برای پروژه مرتبط است آن را انتخاب کن؛ خالی ماندن آن مانع ادامه نیست.</small>
+          <small class="todo-sample"><strong>مثال:</strong> ${note}</small>
+        </div>
+      </label>`;
+  }).join('');
+
+  syncChecklistDOM(key);
+}
+
+function renderStages(){
+  $('stageList').innerHTML=gates.map((g,i)=>{
+    const ok=!!state.approved[g];
+    return `<div class="stage">
+      <div class="num">${i+1}</div>
+      <div class="meta"><b>${g}</b><small>${ok?'تأیید شده':'در انتظار تکمیل مرحله مربوطه'}</small></div>
+      <span class="badge ${ok?'ok':'pending'}">${ok?'Approved':'Pending'}</span>
+    </div>`
+  }).join('');
+  updateProgress();
+  if(typeof renderApprovalBars==='function') renderApprovalBars();
+  if(typeof updateWorkflowMenu==='function') updateWorkflowMenu();
+  if(typeof updateDashboardCTA==='function') updateDashboardCTA();
+  if(typeof updateWizardActionBar==='function') updateWizardActionBar();
+}
+
+function approveStage(name){
+  dashboardToggleGate(name);
+}
+
+function goNext(){
+  const current=stepBySection(state.activeSection)||workflowSteps[0];
+  const idx=workflowSteps.findIndex(s=>s.section===current.section);
+  if(idx<workflowSteps.length-1){
+    const next=workflowSteps[idx+1];
+    if(!canOpenSection(next.section)){
+      toast(`برای ورود به مرحله ${next.no} ابتدا مرحله فعلی را کامل و تأیید کن.`,'error');
+      return;
+    }
+    showSection(next.section);
+  }
+}
+
+function updateProgress(){
+  const visibleSteps=workflowSteps.slice(1);
+  const done=visibleSteps.filter(step=>stepApproved(step)).length;
+  const pct=Math.round(done/visibleSteps.length*100);
+  $('progressBar').style.width=pct+'%';
+  $('progressText').textContent=`${pct}٪ تکمیل شده — ${done} از ${visibleSteps.length} مرحله`;
+}
+
+
+function collectFormSnapshot(){
+  const fields={};
+  allInputs().forEach(el=>{
+    if(el.type==='checkbox' || el.type==='radio'){
+      fields[el.id]={kind:el.type, checked:el.checked, value:el.value};
+    }else{
+      fields[el.id]={kind:el.tagName.toLowerCase(), value:el.value};
+    }
+  });
+  return fields;
+}
+
+function collectGeneratedOutputs(){
+  return {
+    codexOutput: $('codexOutput')?.textContent || '',
+    handoverOutput: $('handoverOutput')?.textContent || ''
+  };
+}
+
+function collectProjectSnapshot(){
+  saveAll(false);
+
+  return {
+    format: 'HAFS_FULL_PROJECT',
+    schemaVersion: 2,
+    appVersion: 'v10-complete-import-export',
+    exportedAt: new Date().toISOString(),
+
+    project: {
+      name: state.projectName || '',
+      clientName: state.clientName || '',
+      status: state.projectStatus || ''
+    },
+
+    workflow: {
+      activeSection: state.activeSection || 'dashboard',
+      approved: {...(state.approved || {})},
+      approvedAt: {...(state.approvedAt || {})}
+    },
+
+    form: collectFormSnapshot(),
+
+    selections: {
+      modules: {...(state.modules || {})},
+      checks: {...(state.checks || {})}
+    },
+
+    generatedOutputs: collectGeneratedOutputs(),
+
+    // Keep the complete raw state too for forward/backward compatibility.
+    state: JSON.parse(JSON.stringify(state))
+  };
+}
+
+function normalizeImportedProject(payload){
+  if(!payload || typeof payload!=='object'){
+    throw new Error('ساختار فایل پروژه معتبر نیست.');
+  }
+
+  let importedState={};
+
+  // New full snapshot format
+  if(payload.format==='HAFS_FULL_PROJECT'){
+    importedState = payload.state && typeof payload.state==='object'
+      ? JSON.parse(JSON.stringify(payload.state))
+      : {};
+
+    // Form is authoritative for every user-editable field, including empty values.
+    if(payload.form && typeof payload.form==='object'){
+      Object.entries(payload.form).forEach(([id,entry])=>{
+        if(entry && typeof entry==='object' && 'value' in entry){
+          importedState[id]=entry.value;
+        }
+      });
+    }
+
+    if(payload.workflow && typeof payload.workflow==='object'){
+      importedState.activeSection = payload.workflow.activeSection || importedState.activeSection || 'dashboard';
+      importedState.approved = {...(payload.workflow.approved || {})};
+      importedState.approvedAt = {...(payload.workflow.approvedAt || {})};
+    }
+
+    if(payload.selections && typeof payload.selections==='object'){
+      importedState.modules = {...(payload.selections.modules || {})};
+      importedState.checks = {...(payload.selections.checks || {})};
+    }
+
+    importedState.generatedOutputs = {
+      ...(importedState.generatedOutputs || {}),
+      ...(payload.generatedOutputs || {})
+    };
+  }else{
+    // Backward compatibility with v1-v9 exports that were just the raw state object.
+    importedState = JSON.parse(JSON.stringify(payload));
+  }
+
+  importedState.approved = importedState.approved || {};
+  importedState.approvedAt = importedState.approvedAt || {};
+  importedState.checks = importedState.checks || {};
+  importedState.modules = importedState.modules || {};
+  importedState.generatedOutputs = importedState.generatedOutputs || {};
+  importedState.activeSection = importedState.activeSection || 'dashboard';
+
+  return importedState;
+}
+
+function applyStateToUI(){
+  allInputs().forEach(el=>{
+    if(!(el.id in state)) return;
+    if(el.type==='checkbox' || el.type==='radio'){
+      el.checked=!!state[el.id];
+    }else{
+      el.value=state[el.id] ?? '';
+    }
+  });
+
+  document.querySelectorAll('[data-module]').forEach(c=>{
+    c.checked=!!state.modules?.[c.dataset.module];
+  });
+
+  document.querySelectorAll('[data-check]').forEach(c=>{
+    c.checked=!!state.checks?.[c.dataset.check];
+  });
+
+  if($('codexOutput')){
+    $('codexOutput').textContent=state.generatedOutputs?.codexOutput || '';
+  }
+  if($('handoverOutput')){
+    $('handoverOutput').textContent=state.generatedOutputs?.handoverOutput || '';
+  }
+
+  document.querySelectorAll('textarea[id]').forEach(el=>{
+    if(typeof updateFieldCounter==='function') updateFieldCounter(el);
+  });
+
+  renderStages();
+  renderApprovalBars();
+  updateWorkflowMenu();
+  updateDashboardCTA();
+  updateWizardActionBar();
+}
+
+function allInputs(){
+  return [...document.querySelectorAll('input[id],textarea[id],select[id]')].filter(el=>el.type!=='file');
+}
+
+function saveAll(show=true){
+  setSaveStatus('saving');
+
+  allInputs().forEach(el=>{
+    if(el.type==='checkbox' || el.type==='radio'){
+      state[el.id]=el.checked;
+    }else{
+      state[el.id]=el.value;
+    }
+  });
+
+  // Preserve explicit empty selections; never auto-fill them during save/import.
+  state.modules={};
+  document.querySelectorAll('[data-module]').forEach(c=>{
+    state.modules[c.dataset.module]=c.checked;
+  });
+
+  state.checks=state.checks || {};
+  document.querySelectorAll('[data-check]').forEach(c=>{
+    state.checks[c.dataset.check]=c.checked;
+  });
+
+  state.generatedOutputs=collectGeneratedOutputs();
+
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+
+  // Once migrated to v10, keep one canonical storage key.
+  LEGACY_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));
+
+  setTimeout(()=>setSaveStatus('saved'),120);
+  if(show) flash('ذخیره کامل شد');
+}
+
+function loadAll(){
+  applyStateToUI();
+  showSection(state.activeSection||'dashboard', true);
+  applyStateToUI();
+}
+
+function flash(msg){
+  const old=document.title; document.title='✓ '+msg;
+  setTimeout(()=>document.title=old,900);
+}
+
+function resetProject(){
+  if(!confirm('همه اطلاعات این پروژه حذف شود؟')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  LEGACY_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));
+  localStorage.removeItem('hafsProject_before_import_backup');
+  location.reload();
+}
+
+function exportProject(){
+  try{
+    const snapshot=collectProjectSnapshot();
+
+    const blob=new Blob(
+      [JSON.stringify(snapshot,null,2)],
+      {type:'application/json;charset=utf-8'}
+    );
+
+    const a=document.createElement('a');
+    const url=URL.createObjectURL(blob);
+    a.href=url;
+    a.download=(state.projectName||'HAFS-Project')
+      .replace(/[^\w\u0600-\u06FF-]+/g,'-')+'-FULL.json';
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+    const fieldCount=Object.keys(snapshot.form).length;
+    const checkCount=Object.keys(snapshot.selections.checks).length;
+    const moduleCount=Object.keys(snapshot.selections.modules).length;
+    const approvalCount=Object.keys(snapshot.workflow.approved).length;
+
+    toast(
+      `Export کامل انجام شد: ${fieldCount} فیلد، ${moduleCount} ماژول، ${checkCount} Checklist و ${approvalCount} Approval.`,
+      'ok'
+    );
+  }catch(err){
+    console.error(err);
+    toast('Export کامل پروژه انجام نشد.','error');
+  }
+}
+
+$('importFile').addEventListener('change',e=>{
+  const input=e.target;
+  const f=input.files?.[0];
+  if(!f) return;
+
+  const r=new FileReader();
+
+  r.onload=()=>{
+    try{
+      const payload=JSON.parse(r.result);
+
+      // Safety backup of the project currently open before replacing it.
+      const currentSnapshot=collectProjectSnapshot();
+      localStorage.setItem(
+        'hafsProject_before_import_backup',
+        JSON.stringify(currentSnapshot)
+      );
+
+      const normalized=normalizeImportedProject(payload);
+
+      state=normalized;
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+      LEGACY_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));
+
+      applyStateToUI();
+
+      // Restore the exact imported workflow page.
+      showSection(state.activeSection||'dashboard', true);
+      applyStateToUI();
+
+      const importedFields =
+        payload.format==='HAFS_FULL_PROJECT'
+          ? Object.keys(payload.form||{}).length
+          : Object.keys(normalized).filter(k=>!['approved','approvedAt','checks','modules','generatedOutputs'].includes(k)).length;
+
+      toast(
+        `Import کامل انجام شد. ${importedFields} فیلد و تمام مراحل/Approvalها/Checklistها بازیابی شدند.`,
+        'ok'
+      );
+    }catch(err){
+      console.error(err);
+      alert('فایل JSON معتبر نیست یا ساختار پروژه قابل Import نیست.');
+    }finally{
+      // Allows importing the same file again without refreshing.
+      input.value='';
+    }
+  };
+
+  r.onerror=()=>{
+    alert('خواندن فایل Import با خطا مواجه شد.');
+    input.value='';
+  };
+
+  r.readAsText(f,'utf-8');
+});
+
+function selectedModules(){
+  return [...document.querySelectorAll('[data-module]:checked')].map(x=>x.dataset.module);
+}
+
+function generateInterview(){
+  invalidateSectionApprovals('interview', true);
+  const raw=$('clientRaw').value.trim();
+  $('criticalQuestions').value=`1) هدف اصلی این سایت برای کسب‌وکار شما چیست؟
+2) کاربران اصلی سایت چه کسانی هستند؟
+3) مهم‌ترین کاری که کاربر باید بتواند در سایت انجام دهد چیست؟
+4) آیا سایت فعلی، دامنه یا زیرساخت قبلی دارید؟
+5) چه قابلیت‌هایی برای نسخه اول حتماً ضروری هستند؟
+6) آیا پرداخت، ثبت‌نام، رزرو، سفارش یا پنل کاربری نیاز دارید؟
+7) زمان تحویل و بودجه تقریبی پروژه چیست؟`;
+  $('importantQuestions').value=`1) چه نمونه سایت‌هایی را از نظر ظاهر یا تجربه کاربری می‌پسندید؟
+2) آیا هویت بصری، لوگو، رنگ سازمانی و فونت مشخص دارید؟
+3) چه کسانی سایت را مدیریت خواهند کرد و چه سطح دسترسی لازم دارند؟
+4) آیا به گزارش‌گیری، CRM، انبار، حسابداری سبک یا اتوماسیون نیاز دارید؟
+5) محتوای سایت را چه کسی تأمین می‌کند؟
+6) آیا SEO و رشد ارگانیک برای شما مهم است؟`;
+  $('optionalQuestions').value=`1) قابلیت‌های آینده‌ای که ممکن است بعداً اضافه شوند چیست؟
+2) آیا اتصال به شبکه‌های اجتماعی یا ابزارهای خارجی نیاز دارید؟
+3) آیا چندزبانه بودن یا اپ موبایل در آینده مطرح است؟
+4) آیا ترجیح خاصی برای هاست یا سرویس‌های پرداخت دارید؟`;
+  $('technicalDecisions').value=`مواردی مثل معماری Frontend/Backend، Database، ORM، Rendering Strategy، Caching، Security Headers، Monitoring، ساختار API و انتخاب Deployment Platform توسط تیم فنی براساس نیاز واقعی پروژه تعیین می‌شود.`;
+  if(raw) $('knownReq').value = $('knownReq').value || `درخواست اولیه کارفرما:\n${raw}`;
+  saveAll(false);
+}
+
+function generateDNA(){
+  invalidateSectionApprovals('classification', true);
+  const mods=selectedModules();
+  $('siteDna').value=`BASE
+${$('baseType').value}
+
+LEVEL
+${$('projectLevel').value}
+
+SYSTEM
+${$('systemType').value}
+
+MODULES
+${mods.length?mods.join('\n'):'To be defined'}
+
+DEPLOYMENT
+DashPloy — Preview / Test
+${$('productionPlatform').value || 'Vercel'} — Production candidate`;
+  saveAll(false);
+}
+
+function generateScenario(){
+  invalidateSectionApprovals('scenario', true);
+  const mods=selectedModules().join(', ')||'To be defined';
+  if(!$('businessScenario').value) $('businessScenario').value=`هدف پروژه بر اساس اطلاعات کارفرما تعریف شود. مدل کسب‌وکار، مخاطب، ارزش پیشنهادی و معیار موفقیت مشخص شود.`;
+  if(!$('userScenario').value) $('userScenario').value=`نقش‌های کاربری، سطح دسترسی و User Journey هر نقش قبل از ساخت نهایی شوند.`;
+  if(!$('pagesScenario').value) $('pagesScenario').value=`صفحات Public، Auth، User/Admin، Legal و Error Pages براساس نوع ${$('baseType').value} مشخص شوند.`;
+  if(!$('featureScenario').value) $('featureScenario').value=`ماژول‌های پیشنهادی فعلی: ${mods}\nویژگی‌ها به Required / Recommended / Optional / Future تقسیم شوند.`;
+  if(!$('designScenario').value) $('designScenario').value=`Design System، Responsive UX، Accessibility، Loading/Empty/Error States و هویت بصری پروژه مشخص شوند.`;
+  if(!$('architectureScenario').value) $('architectureScenario').value=`معماری براساس نیاز پروژه انتخاب شود؛ Hosting نباید معماری را تحمیل کند. Database، Auth، API، Storage، Integrations و Deployment Strategy قبل از Coding نهایی شوند.`;
+  if(!$('seoScenario').value) $('seoScenario').value=`SEO / AEO / GEO شامل Metadata، Sitemap، robots.txt، Canonical، Structured Data، Internal Linking و Indexability بررسی شود.`;
+  if(!$('opsScenario').value) $('opsScenario').value=`Security، Performance، Backup، Monitoring، Logging، QA قبل/بعد انتشار و Penetration Testing مجاز جزو Definition of Done باشند.`;
+  saveAll(false);
+}
+
+function generateCodexPrompt(){
+  invalidateSectionApprovals('codex', true);
+  saveAll(false);
+  const phase=$('codexPhase').value;
+  const mods=selectedModules().join(', ')||'Not finalized';
+  const text=`PROJECT: ${state.projectName||'Unnamed Project'}
+PHASE: ${phase}
+
+CONTEXT:
+Client raw request:
+${state.clientRaw||'Not provided'}
+
+SITE DNA:
+${state.siteDna||'Not generated'}
+
+SELECTED MODULES:
+${mods}
+
+OBJECTIVE:
+Implement only the scope of "${phase}" according to the approved project scenario and architecture.
+
+CONSTRAINTS:
+- Do not make unrelated changes.
+- Do not change approved architecture without explicit approval.
+- Preserve existing working features.
+- Keep secrets out of source control.
+- Use production-quality TypeScript and maintainable structure.
+- Respect RTL/LTR requirements where applicable.
+- Do not proceed into a later project phase.
+
+ACCEPTANCE CRITERIA:
+1. The phase scope is fully implemented.
+2. No build/type/lint errors caused by this change.
+3. Relevant functionality is tested.
+4. Edge cases for this phase are handled.
+5. Security considerations relevant to this phase are reviewed.
+6. Summarize changed files and test results.
+
+DEFINITION OF DONE:
+- Implementation complete
+- Tests complete
+- No known critical regression
+- Ready for Hossein review and approval
+
+IMPORTANT:
+Stop after this phase and report results. Do not continue to the next phase without explicit approval.`;
+  $('codexOutput').textContent=text;
+  state.generatedOutputs=state.generatedOutputs||{};
+  state.generatedOutputs.codexOutput=text;
+  saveAll(false);
+}
+
+function generateHandover(){
+  invalidateSectionApprovals('handover', true);
+  saveAll(false);
+  $('handoverOutput').textContent=`تحویل پروژه: ${state.projectName||'—'}
+کارفرما: ${state.clientName||'—'}
+Production: ${state.productionUrl||'—'}
+Preview: ${state.previewUrl||'—'}
+پلتفرم Production: ${state.productionPlatform||'—'}
+
+وضعیت نهایی:
+- Functional QA: ${state.approved?.['QA #2']?'تأیید':'نیازمند بررسی'}
+- Security: ${state.approved?.['Security #2']?'تأیید':'نیازمند بررسی'}
+- SEO/Performance: ${state.approved?.['SEO/Performance']?'تأیید':'نیازمند بررسی'}
+- Handover: ${state.approved?.['Handover']?'تأیید':'در انتظار تأیید'}
+
+اطلاعات حساس باید خارج از این سند و از مسیر امن منتقل شوند.`;
+  state.generatedOutputs=state.generatedOutputs||{};
+  state.generatedOutputs.handoverOutput=$('handoverOutput').textContent||'';
+  saveAll(false);
+}
+
+function copyText(id){ navigator.clipboard.writeText($(id).value||''); flash('کپی شد'); }
+function copyOutput(id){ navigator.clipboard.writeText($(id).textContent||''); flash('کپی شد'); }
+
+renderModules();
+document.querySelectorAll('[data-module]').forEach(c=>{
+  c.checked=sampleDefaultModules.includes(c.dataset.module);
+});
+renderChecklist('buildChecklist',buildItems,'build');
+renderChecklist('qa1Checklist',qa1Items,'qa1');
+renderChecklist('sec1Checklist',sec1Items,'sec1');
+renderChecklist('qa2Checklist',qa2Items,'qa2');
+renderChecklist('sec2Checklist',sec2Items,'sec2');
+renderChecklist('seoChecklist',seoItems,'seo');
+renderChecklist('handoverChecklist',handoverItems,'handover');
+installApprovalBars();
+loadAll();
+updateWorkflowMenu();
+updateDashboardCTA();
+updateWizardActionBar();
+enhanceTextareas();
+applySmartPlaceholders();
+
+function sectionForElement(el){
+  return el?.closest?.('.section')?.id || null;
+}
+
+
+$('fullscreenTextarea')?.addEventListener('input',()=>{
+  fullscreenDirty=true;
+  updateFullscreenCounter();
+});
+
+document.addEventListener('keydown',e=>{
+  if($('fullscreenEditor')?.classList.contains('open')){
+    if(e.key==='Escape'){
+      e.preventDefault();
+      closeFullscreenEditor(false);
+    }
+    if((e.ctrlKey||e.metaKey) && e.key==='Enter'){
+      e.preventDefault();
+      closeFullscreenEditor(true);
+    }
+  }
+});
+
+document.addEventListener('change',e=>{
+  if(e.target.matches('[data-check]')){
+    const key=e.target.dataset.check.split(':')[0];
+    state.checks[e.target.dataset.check]=e.target.checked;
+    invalidateChecklistRelatedGate(key);
+  }
+  const sectionId=sectionForElement(e.target);
+  if(sectionId && sectionId!=='dashboard') invalidateSectionApprovals(sectionId);
+  saveAll(false);
+});
+
+document.addEventListener('input',e=>{
+  if(!e.target.matches('input,textarea,select')) return;
+  if(e.target.matches('textarea[id]')) updateFieldCounter(e.target);
+  const sectionId=sectionForElement(e.target);
+  if(sectionId && sectionId!=='dashboard') invalidateSectionApprovals(sectionId);
+  if(e.target.id==='projectName') updateWorkflowMenu();
+  clearTimeout(window.__saveTimer);
+  window.__saveTimer=setTimeout(()=>saveAll(false),400);
+});
+</script>
+</body>
+</html>

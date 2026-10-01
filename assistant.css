@@ -1,0 +1,50 @@
+.assistant-dialog {
+  width: min(760px, calc(100vw - 24px));
+  max-height: min(820px, calc(100dvh - 24px));
+  padding: 0;
+  border: 1px solid #43547e;
+  border-radius: 20px;
+  background: #10182c;
+  color: var(--text);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .55);
+}
+.assistant-dialog::backdrop { background: rgba(3, 7, 17, .76); backdrop-filter: blur(4px); }
+.assistant-shell { display: flex; flex-direction: column; max-height: min(820px, calc(100dvh - 24px)); }
+.assistant-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.assistant-header h2 { margin: 0; font-size: 18px; }
+.assistant-header p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+.assistant-header-actions { display: flex; gap: 8px; align-items: center; }
+.assistant-small-button { border: 1px solid var(--line); border-radius: 10px; background: #17213a; color: var(--text); padding: 8px 11px; cursor: pointer; }
+.assistant-small-button:hover, .assistant-small-button:focus-visible { border-color: var(--accent); }
+.assistant-body { min-height: 0; display: flex; flex-direction: column; padding: 18px 20px 20px; }
+.assistant-gate { line-height: 1.9; color: var(--muted); font-size: 14px; }
+.assistant-gate a { display: inline-block; margin-top: 12px; padding: 10px 15px; border-radius: 10px; background: var(--accent); color: #fff; text-decoration: none; font-weight: 700; }
+.assistant-gate a:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.assistant-chat { min-height: 0; display: flex; flex-direction: column; gap: 12px; }
+.assistant-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.assistant-controls label { color: var(--muted); font-size: 12px; }
+.assistant-controls select { min-width: 150px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: #0c1426; color: var(--text); }
+.assistant-context { display: inline-flex; gap: 8px; align-items: center; max-width: 100%; margin: 0; color: var(--muted); font-size: 12px; cursor: pointer; }
+.assistant-context input { width: auto; flex: none; margin: 0; padding: 0; accent-color: var(--accent); }
+.assistant-messages { min-height: 150px; height: min(330px, 42vh); overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #0b1223; }
+.assistant-empty { color: var(--muted); line-height: 1.8; font-size: 13px; }
+.assistant-message { max-width: 94%; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; font-size: 13px; border-radius: 12px; padding: 10px 12px; }
+.assistant-message.user { align-self: flex-start; background: #22315b; }
+.assistant-message.assistant { align-self: flex-end; background: #152a29; border: 1px solid #2f6258; }
+.assistant-form { display: flex; flex-direction: column; gap: 9px; }
+.assistant-form label { color: var(--muted); font-size: 12px; }
+.assistant-form textarea { min-height: 90px; max-height: 190px; resize: vertical; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #0b1223; color: var(--text); line-height: 1.7; }
+.assistant-form textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.assistant-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.assistant-footer .assistant-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.assistant-send { border: 0; border-radius: 10px; background: var(--accent); color: #fff; padding: 10px 17px; font-weight: 700; cursor: pointer; }
+.assistant-send:disabled, .assistant-small-button:disabled { opacity: .55; cursor: wait; }
+.assistant-status { min-height: 1.5em; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.assistant-status.error { color: #ffb5bd; }
+[hidden] { display: none !important; }
+@media (max-width: 600px) {
+  .assistant-dialog { width: calc(100vw - 12px); max-height: calc(100dvh - 12px); }
+  .assistant-shell { max-height: calc(100dvh - 12px); }
+  .assistant-header, .assistant-body { padding: 14px; }
+  .assistant-messages { height: 32vh; }
+}

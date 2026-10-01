@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HAFS — Hossein AI Freelance System</title>
+  <link rel="stylesheet" href="/assistant.css" />
   <style>
     :root{
       --bg:#0b1020;--panel:#11182d;--panel2:#151f38;--line:#263252;
@@ -306,6 +307,7 @@
       </div>
       <div class="top-actions">
         <div class="save-indicator"><span id="saveDot" class="save-dot saved"></span><span id="saveText">ذخیره شده</span></div>
+        <button id="assistantLaunch" class="btn secondary" type="button">✦ دستیار من</button>
         <button class="btn secondary" onclick="toggleFocusMode()">حالت تمرکز</button>
         <button class="btn secondary" onclick="saveAll()">ذخیره</button>
         <button class="btn secondary" onclick="exportProject()">Export کامل JSON</button>
@@ -1083,6 +1085,53 @@ Checklist:
     </div>
   </main>
 </div>
+
+<dialog id="assistantDialog" class="assistant-dialog" aria-labelledby="assistantTitle">
+  <div class="assistant-shell">
+    <div class="assistant-header">
+      <div>
+        <h2 id="assistantTitle">دستیار HAFS</h2>
+        <p>کمک به فرم‌ها، برنامه‌ریزی پروژه و پاسخ به سؤال‌ها</p>
+      </div>
+      <div class="assistant-header-actions">
+        <button id="assistantLogout" class="assistant-small-button" type="button" hidden>خروج</button>
+        <button id="assistantClose" class="assistant-small-button" type="button" aria-label="بستن دستیار">✕</button>
+      </div>
+    </div>
+    <div class="assistant-body">
+      <div id="assistantGate" class="assistant-gate">
+        <p id="assistantGateText">در حال بررسی دسترسی…</p>
+        <a id="assistantSignIn" href="/api/auth/start" hidden>ورود با ChatGPT</a>
+      </div>
+      <div id="assistantChat" class="assistant-chat" hidden>
+        <div class="assistant-controls">
+          <label for="assistantMode">نوع کمک</label>
+          <select id="assistantMode">
+            <option value="form">کمک به فرم فعلی</option>
+            <option value="plan">برنامه‌ریزی پروژه</option>
+            <option value="question">پرسش و پاسخ</option>
+          </select>
+          <label class="assistant-context"><input id="assistantUseContext" type="checkbox" checked> اطلاعات بخش فعلی همراه پرسش ارسال شود</label>
+        </div>
+        <div id="assistantMessages" class="assistant-messages" role="log" aria-live="polite" aria-label="گفتگو با دستیار">
+          <p class="assistant-empty">از فرم فعلی کمک بگیرید، برنامهٔ پروژه بخواهید یا سؤال خود را بپرسید.</p>
+        </div>
+        <form id="assistantForm" class="assistant-form">
+          <label for="assistantPrompt">پیام شما</label>
+          <textarea id="assistantPrompt" maxlength="2500" required placeholder="مثلاً برای این فرم چه سؤال‌های مهمی از کارفرما بپرسم؟"></textarea>
+          <div class="assistant-footer">
+            <div class="assistant-actions">
+              <button id="assistantSend" class="assistant-send" type="submit">ارسال</button>
+              <button id="assistantInsert" class="assistant-small-button" type="button" hidden>افزودن به فیلد انتخاب‌شده</button>
+              <button id="assistantCopy" class="assistant-small-button" type="button" hidden>کپی پاسخ</button>
+            </div>
+            <span id="assistantStatus" class="assistant-status" role="status" aria-live="polite"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</dialog>
 
 <script>
 const sections = [...document.querySelectorAll('.section')];
@@ -2290,7 +2339,7 @@ function applyStateToUI(){
 }
 
 function allInputs(){
-  return [...document.querySelectorAll('input[id],textarea[id],select[id]')].filter(el=>el.type!=='file');
+  return [...document.querySelectorAll('.app input[id],.app textarea[id],.app select[id]')].filter(el=>el.type!=='file');
 }
 
 function saveAll(show=true){
@@ -2620,6 +2669,7 @@ document.addEventListener('keydown',e=>{
 });
 
 document.addEventListener('change',e=>{
+  if(!e.target.closest('.app')) return;
   if(e.target.matches('[data-check]')){
     const key=e.target.dataset.check.split(':')[0];
     state.checks[e.target.dataset.check]=e.target.checked;
@@ -2631,7 +2681,7 @@ document.addEventListener('change',e=>{
 });
 
 document.addEventListener('input',e=>{
-  if(!e.target.matches('input,textarea,select')) return;
+  if(!e.target.closest('.app') || !e.target.matches('input,textarea,select')) return;
   if(e.target.matches('textarea[id]')) updateFieldCounter(e.target);
   const sectionId=sectionForElement(e.target);
   if(sectionId && sectionId!=='dashboard') invalidateSectionApprovals(sectionId);
@@ -2640,5 +2690,7 @@ document.addEventListener('input',e=>{
   window.__saveTimer=setTimeout(()=>saveAll(false),400);
 });
 </script>
+<script src="/assistant.js" defer></script>
 </body>
 </html>
+

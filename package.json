@@ -1,0 +1,14 @@
+{
+  "name": "hafs",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "jose": "6.2.12"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

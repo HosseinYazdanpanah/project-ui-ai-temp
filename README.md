@@ -1,3 +1,5 @@
+> **Next.js migration (2026-10-24):** The runtime is now Next.js App Router. See [MIGRATION.md](MIGRATION.md) for installation, file organization, compatibility notes, Rubika webhook setup and Vercel settings. The historic single-file documentation below describes the original UI and workflow behavior.
+
 ![HOSSEIN HAFS Hero](https://raw.githubusercontent.com/HosseinYazdanpanah/project-ui-ai-temp/main/assets/HOSSEIN-HAFS-hero-overlay-1280x720.jpg)
 
 <div align="center">
@@ -9,8 +11,8 @@
 **از اولین پیام کارفرما تا نیازسنجی، سناریو، معماری، توسعه، QA، امنیت، انتشار و تحویل نهایی — همه در یک Workflow مرحله‌به‌مرحله و قابل کنترل.**
 
 ![Status](https://img.shields.io/badge/status-active%20development-1677ff)
-![Architecture](https://img.shields.io/badge/architecture-single--file%20web%20app-111827)
-![Frontend](https://img.shields.io/badge/frontend-HTML%20%2B%20CSS%20%2B%20JavaScript-f59e0b)
+![Architecture](https://img.shields.io/badge/architecture-Next.js%20App%20Router-111827)
+![Frontend](https://img.shields.io/badge/frontend-Next.js%20%2B%20React-f59e0b)
 ![Storage](https://img.shields.io/badge/storage-LocalStorage%20%2B%20JSON-22c55e)
 ![Direction](https://img.shields.io/badge/direction-RTL%20%2F%20Persian-06b6d4)
 

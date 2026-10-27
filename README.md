@@ -240,6 +240,38 @@ Developed and maintained by [Hossein Yazdanpanah](https://github.com/HosseinYazd
 
 **License:** No root `LICENSE` file is currently present in this repository. Source visibility does not automatically grant permission for copying, redistribution or commercial reuse.
 
+## 🧰 Operator's handbook | راهنمای اجرای پروژه
+
+### The handoff contract
+
+Every stage should result in a **reviewable artifact**, not an unverified completion badge:
+
+| Gate | Evidence to review |
+|:--|:--|
+| Discovery | Explicit client brief, constraints and unresolved questions |
+| Architecture | Pages, data, external services and acceptance criteria |
+| Prompt pack | Scope-bounded implementation instructions |
+| Build | Commit, preview or implementation evidence |
+| QA & Security | Findings, test method and remediation status |
+| Deployment | Actual environment URL and verified behavior |
+| Handover | Deliverables, credentials ownership and remaining work |
+
+An approval in the HAFS interface represents the operator's decision. It does **not** automatically call Codex, publish a website, perform a penetration test or verify a third-party deployment.
+
+### 🔬 Maintenance & release checks
+
+~~~bash
+npm run typecheck
+npm test
+npm run build
+~~~
+
+Review the compatibility boundaries before migrating any part of `public/hafs/runtime.js` into React. Retain stable LocalStorage keys or provide a versioned migration; test export/import *before and after* the change. Never place API keys or client credentials into browser storage, test fixtures, screenshots or repository history.
+
+### 🤝 Collaboration model
+
+Keep human approval explicit for external actions, write assumptions separately from confirmed requirements, and document reproducible QA evidence with each substantial change. For Rubika integration, validate authentication and callbacks in the configured Node.js deployment rather than treating the existence of `/api/rubika` as proof of connectivity.
+
 <div align="center">
 
 ### HAFS · Plan with clarity. Build with confidence. Deliver with proof.

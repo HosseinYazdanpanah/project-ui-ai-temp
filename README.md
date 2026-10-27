@@ -1,1148 +1,249 @@
-> **Next.js migration (2026-10-24):** The runtime is now Next.js App Router. See [MIGRATION.md](MIGRATION.md) for installation, file organization, compatibility notes, Rubika webhook setup and Vercel settings. The historic single-file documentation below describes the original UI and workflow behavior.
-
-![HOSSEIN HAFS Hero](https://raw.githubusercontent.com/HosseinYazdanpanah/project-ui-ai-temp/main/assets/HOSSEIN-HAFS-hero-overlay-1280x720.jpg)
-
 <div align="center">
 
-# HAFS — Hossein AI Freelance System
+<img src="./public/assets/HOSSEIN-HAFS-hero-overlay-1280x720.jpg" alt="HAFS | Hossein AI Freelance System" width="100%" />
 
-### AI-Assisted Freelance Project Operating System for Web Projects
+# HAFS
+### Hossein AI Freelance System
 
-**از اولین پیام کارفرما تا نیازسنجی، سناریو، معماری، توسعه، QA، امنیت، انتشار و تحویل نهایی — همه در یک Workflow مرحله‌به‌مرحله و قابل کنترل.**
+**From the first client message to final delivery.**
 
-![Status](https://img.shields.io/badge/status-active%20development-1677ff)
-![Architecture](https://img.shields.io/badge/architecture-Next.js%20App%20Router-111827)
-![Frontend](https://img.shields.io/badge/frontend-Next.js%20%2B%20React-f59e0b)
-![Storage](https://img.shields.io/badge/storage-LocalStorage%20%2B%20JSON-22c55e)
-![Direction](https://img.shields.io/badge/direction-RTL%20%2F%20Persian-06b6d4)
+**از دریافت پروژه تا تحویل نهایی؛ یک مسیر روشن، مستند و قابل تأیید برای توسعه پروژه‌های وب.**
+
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-149ECA?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+![Workflow](https://img.shields.io/badge/Workflow-10%20Stages-6366f1)
+![Language](https://img.shields.io/badge/Language-Persian%20%7C%20RTL-06b6d4)
+![Development](https://img.shields.io/badge/Status-Active%20Development-f59e0b)
+
+**[راهنمای مهاجرت به Next.js](MIGRATION.md) · [Source code](https://github.com/HosseinYazdanpanah/project-ui-ai-x-mrhossein)**
 
 </div>
 
 ---
 
-## درباره HAFS
+## 🚀 HAFS چیست؟ | Overview
 
-**HAFS** مخفف **Hossein AI Freelance System** است؛ یک سیستم مدیریت فرایند فریلنسری برای پروژه‌های وب که با هدف تبدیل یک روند پراکنده و وابسته به حافظه به یک **فرایند ساختاریافته، قابل پیگیری، قابل بازبینی و قابل توسعه** ساخته شده است.
+**HAFS** یک فضای کاری مرحله‌ای برای مدیریت فرایند پروژه‌های فریلنسری وب است؛ از گفت‌وگوی ابتدایی با کارفرما و تحلیل نیازها تا تعیین معماری، تولید Promptهای اجرایی، ساخت، کنترل کیفیت، استقرار و تحویل. هدف، تبدیل تصمیم‌های پراکنده به روندی **شفاف، قابل پیگیری، مستند و تحت کنترل انسان** است.
 
-این پروژه فقط یک فرم ثبت اطلاعات یا Todo List نیست. HAFS تلاش می‌کند تمام تصمیم‌های مهم یک پروژه را از لحظه ورود مشتری تا تحویل نهایی در یک مسیر مشخص نگه دارد؛ به‌طوری‌که نیازهای مشتری، پیشنهادهای حرفه‌ای، تصمیم‌های معماری، Promptهای توسعه، کنترل کیفیت و مراحل انتشار از یکدیگر جدا و قابل مدیریت باشند.
+**English:** HAFS is a Persian-first freelance web-project workflow system. It organizes discovery, planning, architecture, prompt preparation, execution, quality assurance, security reviews, deployment and handover into an approval-driven workspace.
 
-هسته اصلی سیستم بر سه اصل بنا شده است:
+### Philosophy
 
-- **Plan before Code** — قبل از Coding، Scope و معماری باید روشن باشند.
-- **Human Approval** — تصمیم‌های مهم بدون تأیید Project Owner نهایی نمی‌شوند.
-- **Business before Features** — هر Feature باید یک نیاز واقعی کسب‌وکار یا کاربر را حل کند.
+| Principle | Meaning |
+|:--|:--|
+| 🧭 **Plan before Code** | ابتدا نیاز، دامنه، سناریو و معماری؛ سپس پیاده‌سازی |
+| 🧑‍⚖️ **Human Approval** | تصمیم‌های مهم باید توسط صاحب پروژه بازبینی و تأیید شوند |
+| 🎯 **Business before Features** | هر قابلیت باید مسئله‌ای واقعی را حل کند |
+| 🔎 **No invisible assumptions** | درخواست قطعی مشتری با پیشنهاد تخصصی و فرض موقت مخلوط نمی‌شود |
+| 🔐 **Security by Design** | کنترل کیفیت و بازبینی امنیتی جزئی از مسیر تحویل است |
+| 📦 **Client Ownership** | خروجی و تحویل باید قابل فهم و قابل نگهداری باشد |
 
----
+## 🧩 Ten-stage project operating system
 
-# چرا HAFS ساخته شد؟
+HAFS یک داشبورد مرکزی و **۱۰ مرحله اصلی** دارد:
 
-در پروژه‌های فریلنسری وب، بخش بزرگی از خطاها الزاماً از Coding ضعیف ایجاد نمی‌شوند؛ بلکه معمولاً از مواردی مثل نیازسنجی ناقص، Scope مبهم، تصمیم‌های ثبت‌نشده، اضافه شدن Featureهای غیرضروری، نبود QA، ضعف در تحویل و تغییرات بدون کنترل ناشی می‌شوند.
+| # | Stage | Outcome |
+|:--:|:--|:--|
+| **01** | **Project Intake** | ثبت درخواست خام، هدف‌ها و محدودیت‌های پروژه |
+| **02** | **Client Interview** | پرسش‌های حیاتی، کسب‌وکار، مخاطب و رفع ابهام |
+| **03** | **Classification & Site DNA** | تعیین نوع سایت و ماژول‌های موردنیاز |
+| **04** | **Scenario & Architecture** | سناریو، صفحات، داده‌ها، APIها و ساختار فنی |
+| **05** | **Codex Prompt Pack** | تبدیل تصمیم‌ها به بسته Promptهای اجرایی و مرحله‌ای |
+| **06** | **Build** | ثبت و مدیریت فرایند توسعه |
+| **07** | **QA #1 + Security #1** | بازبینی کیفیت، عملکرد و امنیت پیش از انتشار |
+| **08** | **Preview & Deployment** | بررسی پیش‌نمایش و تصمیم برای Production |
+| **09** | **QA #2 + Security #2 + SEO** | آزمون پس از انتشار، عملکرد و بررسی کشف‌پذیری |
+| **10** | **Client Handover** | مستندات، دسترسی‌ها، موارد باز و تحویل نهایی |
 
-HAFS برای کاهش همین مشکلات طراحی شده است.
+~~~text
+ CLIENT REQUEST
+      │
+      ▼
+ DISCOVERY ──► CLASSIFICATION ──► SITE DNA
+      │                              │
+      ▼                              ▼
+ CLIENT INTERVIEW ─────────► SCENARIO & ARCHITECTURE
+                                      │
+                                      ▼
+                             CODEX PROMPT PACK
+                                      │
+                                      ▼
+                                    BUILD
+                                      │
+                                      ▼
+                               QA / SECURITY #1
+                                      │
+                                      ▼
+                               PREVIEW → RELEASE
+                                      │
+                                      ▼
+                           QA / SECURITY #2 + SEO
+                                      │
+                                      ▼
+                               CLIENT HANDOVER
+~~~
 
-هدف این است که پاسخ سؤال‌های مهم پروژه همیشه مشخص باشد:
+> مرحله بعدی باید بر اساس تصمیم و تأیید واقعی انتخاب شود؛ داشتن یک UI برای این مراحل به این معنی نیست که آزمون امنیتی، Deployment یا اجرای Codex **به‌صورت خودکار** انجام شده است.
 
-- کارفرما دقیقاً چه چیزی خواسته است؟
-- چه چیزهایی فقط پیشنهاد حرفه‌ای ما هستند؟
-- چه چیزهایی هنوز فرض محسوب می‌شوند؟
-- چه تصمیم‌هایی نیازمند تأیید کارفرما هستند؟
-- MVP پروژه چیست؟
-- چه Featureهایی Optional یا Future هستند؟
-- معماری قبل از Coding چگونه تعریف شده است؟
-- Codex در هر مرحله دقیقاً چه کاری باید انجام دهد؟
-- چه تست‌هایی قبل و بعد از Deployment انجام شده‌اند؟
-- چه مواردی در زمان Handover باید تحویل داده شوند؟
+## ✨ Features
 
----
+| Feature | What it provides |
+|:--|:--|
+| 📊 **Project Dashboard** | نمای کلی پروژه، مسیر بعدی و درصد تکمیل |
+| 🧠 **Requirements intelligence** | جداسازی نیاز کارفرما، توصیه متخصص، فرض موقت و تصمیم باز |
+| 🎤 **Interview workspace** | سوالات Critical / Important / Optional / Technical |
+| 🧬 **Website DNA** | طبقه‌بندی معماری و انتخاب ماژول‌ها با توجه به مدل کسب‌وکار |
+| 🏛️ **Architecture planning** | ثبت سناریو، صفحات، ماژول‌ها و تصمیم‌های فنی |
+| 🤖 **Prompt pack** | آماده‌سازی دستورالعمل‌های مرحله‌ای برای ابزارهایی مانند Codex |
+| ✅ **Approval gates** | تأیید مرحله پیش از حرکت به مرحله بعد |
+| 💾 **Autosave** | ذخیره‌سازی وضعیت در مرورگر |
+| 📤 **Import / Export** | دریافت و بازیابی پروژه به‌صورت JSON |
+| 🧪 **QA / Security prompts** | چک‌لیست و راهنمای بررسی پیش و پس از استقرار |
+| 📱 **Persian RTL UI** | تجربه فارسی راست‌به‌چپ |
+| 💬 **Rubika route** | Endpoint سروری برای وبهوک ربات روبیکا، در صورت تنظیم واقعی Token |
 
-# Workflow اصلی
+### Requirements: four distinct categories
 
-HAFS پروژه را به یک Workflow مشخص تقسیم می‌کند:
+| Category | Meaning |
+|:--|:--|
+| **Client Requirement** | خواسته‌ای که کارفرما صریحاً اعلام کرده |
+| **Professional Recommendation** | پیشنهادی که تحلیل حرفه‌ای به دست داده |
+| **Temporary Assumption** | پیش‌فرضی که هنوز تأیید نشده |
+| **Client Decision Required** | موردی که بدون پاسخ مشتری نمی‌تواند نهایی شود |
 
-```text
-PROJECT FOUND
+این تفکیک باعث می‌شود دامنه پروژه (**Scope**) شفاف بماند و قابلیت‌های اضافه بدون نیاز واقعی وارد برنامه نشوند.
+
+## 🏗️ Actual implementation
+
+HAFS اکنون روی **Next.js App Router** اجرا می‌شود. برای حفظ ظاهر و رفتار نسخه اصلی، بخش عمده محیط کاری قبلی به‌شکل **Compatibility Layer** نگه داشته شده است؛ این مهاجرت به معنای بازنویسی کامل رابط قدیمی به React Components نیست.
+
+~~~text
+app/
+├── layout.tsx             # Persian RTL document and metadata
+├── page.tsx               # Server-rendered workspace shell
+├── globals.css            # Existing HAFS UI styles
+└── api/rubika/route.ts    # Node.js GET / POST webhook
+
+lib/
+├── hafs-workspace.ts      # Preserved trusted UI markup
+└── rubika.js              # Webhook implementation
+
+public/
+├── hafs/runtime.js        # Original interactive workflow code
+└── assets/                # Local image assets
+
+legacy/index.static.html   # Previous single-file UI
+tests/migration.test.mjs   # Migration/compatibility assertions
+MIGRATION.md               # Technical migration details
+~~~
+
+**Runtime flow**
+
+~~~text
+Next.js server rendering
       ↓
-PROJECT INTAKE
+HAFS static workspace markup
       ↓
-CLIENT INTERVIEW
+/hafs/runtime.js in browser
       ↓
-REQUIREMENT INTELLIGENCE
+Wizard + approvals + UI interaction
       ↓
-SITE CLASSIFICATION
-      ↓
-SITE DNA
-      ↓
-SCENARIO & ARCHITECTURE
-      ↓
-CODEX PROMPT PACK
-      ↓
-BUILD
-      ↓
-QA #1 — PRE-DEPLOYMENT
-      ↓
-SECURITY GATE #1
-      ↓
-PREVIEW / DEPLOYMENT
-      ↓
-QA #2 — PRODUCTION
-      ↓
-SECURITY GATE #2
-      ↓
-SEO / AEO / GEO
-      ↓
-PERFORMANCE & MONITORING
-      ↓
-CLIENT HANDOVER
-      ↓
-MAINTENANCE / FUTURE DEVELOPMENT
-```
+LocalStorage / JSON import-export
+~~~
 
-هر مرحله باید قبل از عبور به مرحله بعد بررسی و تأیید شود.
+The Rubika webhook is a separate **Node.js route handler** requiring a supported server runtime. Standard static hosting cannot execute that route.
 
----
+## ⚡ Run HAFS locally
 
-# مراحل اصلی Wizard
+**Requirements:** Node.js **20.9+** (as declared by the project) and npm.
 
-رابط فعلی HAFS شامل 10 مرحله اصلی است:
+~~~bash
+git clone https://github.com/HosseinYazdanpanah/project-ui-ai-x-mrhossein.git
+cd project-ui-ai-x-mrhossein
+npm install
+npm run dev
+~~~
 
-```text
-01 — Project Intake
-02 — Client Interview
-03 — Classification & Site DNA
-04 — Scenario & Architecture
-05 — Codex Prompts
-06 — Build
-07 — QA #1 + Security #1
-08 — Preview & Deployment
-09 — QA #2 + Security #2 + SEO / Performance
-10 — Client Handover
-```
+Open `http://localhost:3000`.
 
-Dashboard همیشه نقطه شروع و مرکز کنترل پروژه است.
+| Command | Purpose |
+|:--|:--|
+| `npm run dev` | Run development server |
+| `npm run typecheck` | Validate TypeScript |
+| `npm test` | Test migration invariants |
+| `npm run build` | Build production application |
+| `npm run start` | Start production server |
 
----
+### Environment
 
-# 1. Project Intake
+Only the Rubika integration currently declares an environment secret in [`.env.example`](.env.example):
 
-این بخش برای ثبت اطلاعات اولیه و خام پروژه استفاده می‌شود.
+~~~dotenv
+RUBIKA_BOT_TOKEN=
+~~~
 
-اطلاعات به چهار دسته اصلی تقسیم می‌شوند:
+Set the actual token in your private deployment environment or local `.env.local`, **never in GitHub**. Configure the webhook at `https://YOUR_DOMAIN/api/rubika` and verify it against the provider's actual requirements. The rest of the core wizard can be used without a Rubika token.
 
-### ✅ Client Requirement
-مواردی که کارفرما صریحاً درخواست کرده است.
+## 💾 Data model, privacy and backup
 
-### 💡 Professional Recommendation
-مواردی که براساس تجربه، تحلیل کسب‌وکار، UX، امنیت یا معماری پیشنهاد می‌شوند.
+**Current project state lives in the browser's LocalStorage.** This is convenient for private prototyping but has important limits:
 
-### ⚠️ Temporary Assumption
-فرض‌هایی که برای ادامه تحلیل موقتاً در نظر گرفته شده‌اند اما هنوز تأیید نشده‌اند.
+- It is **not** a shared multi-user database.
+- Browser data deletion can erase locally stored work.
+- Storage is tied to the origin. When moving domains, export a JSON backup from the old site and import it at the new one.
+- Keep exported files private if they contain client names, contact details, credentials or confidential requirements.
+- A browser-side project log is **not proof** that an external build, security scan or production verification happened.
 
-### ❓ Client Decision Required
-مواردی که بدون تصمیم مستقیم کارفرما نمی‌توان نهایی کرد.
+Use the built-in JSON export regularly. For team collaboration and durable cloud storage, a permissioned backend and explicit data governance would need to be added.
 
-این جداسازی کمک می‌کند پیشنهاد حرفه‌ای تیم با درخواست واقعی مشتری اشتباه نشود.
+## ☁️ Deploy
 
----
+### Vercel (recommended for this runtime)
 
-# 2. Client Interview
+1. Import the repository from GitHub.
+2. Select **Next.js** as the framework (remove any old Static/Other framework overrides).
+3. Set `RUBIKA_BOT_TOKEN` if using the webhook.
+4. Build with `npm run build`, then verify the home page and API route.
+5. Future pushes to the connected `main` branch can deploy automatically.
 
-HAFS مصاحبه مشتری را از یک فرم ثابت و طولانی جدا می‌کند.
+**GitHub Pages limitation:** The default static-only publishing model does not run the Next.js serverless Rubika webhook.
 
-سؤال‌ها براساس پروژه طراحی می‌شوند و می‌توانند در چهار گروه قرار بگیرند:
+Read [MIGRATION.md](MIGRATION.md) before altering deployment settings.
 
-### Critical Questions
-سؤال‌هایی که بدون پاسخ آن‌ها Scope پروژه قابل نهایی شدن نیست.
+## 🧪 Verification checklist
 
-### Important Questions
-اطلاعاتی که کیفیت طراحی، UX، معماری و تصمیم‌گیری را افزایش می‌دهند.
+- [ ] Local project loads and displays all 10 workflow stages.
+- [ ] A new project can move between stages through approval controls.
+- [ ] Browser refresh preserves the local project state.
+- [ ] JSON export / import preserves the important project fields.
+- [ ] RTL presentation and essential form controls work on mobile and desktop.
+- [ ] `npm run typecheck`, `npm test` and `npm run build` succeed.
+- [ ] Configured Rubika webhook receives and handles authorized events.
+- [ ] Production hosting and domain changes do not silently discard backups.
 
-### Optional Questions
-سؤال‌هایی که برای امکانات پیشرفته، توسعه آینده یا جزئیات تکمیلی مطرح می‌شوند.
+The repository test suite verifies migration-related **source invariants**. It does not replace a full security audit or end-to-end browser test suite.
 
-### Technical Decisions
-تصمیم‌هایی که بهتر است توسط تیم فنی گرفته شوند و نیازی نیست کارفرما با جزئیات غیرضروری فنی درگیر شود.
+## 🛣️ Evolution / Roadmap
 
----
+- [ ] Progressively migrate legacy DOM behaviors to typed, isolated React components.
+- [ ] Add comprehensive UI and accessibility regression tests.
+- [ ] Introduce an optional authenticated, shared project backend.
+- [ ] Expand import/export integrity validation and versioned backups.
+- [ ] Add real integrations only with scoped authorization and explicit user approval.
 
-# Business, Sales & Marketing Discovery
+These describe possible next steps, not implemented production promises.
 
-در HAFS نیازسنجی فقط به سؤال‌هایی مثل «چه صفحاتی می‌خواهید؟» یا «چه رنگی دوست دارید؟» محدود نمی‌شود.
+## 👨‍💻 Project owner
 
-فرایند مصاحبه می‌تواند اطلاعات زیر را استخراج کند:
+Developed and maintained by [Hossein Yazdanpanah](https://github.com/HosseinYazdanpanah).
 
-- Business Model
-- Revenue Model
-- Target Audience
-- Customer Persona
-- Sales Funnel
-- Conversion Path
-- Customer Objections
-- Competitive Advantage
-- Acquisition Channels
-- Existing Marketing Channels
-- Lead Generation
-- Conversion Goals
-- Retention Strategy
-- Upsell / Cross-sell Opportunities
-- Future Growth
-
-### نمونه سؤال بهتر
-
-به‌جای:
-
-```text
-چه سایتی می‌خواهید؟
-```
-
-پرسیده می‌شود:
-
-```text
-اگر خیلی ساده توضیح بدهید، انتظار دارید این سایت چه تغییری در کسب‌وکارتان ایجاد کند؟
-```
-
-و به‌جای:
-
-```text
-CRM می‌خواهید؟
-```
-
-سؤال کسب‌وکاری مطرح می‌شود:
-
-```text
-آیا لازم دارید اطلاعات مشتری، سفارش‌ها، تماس‌ها و پیگیری‌ها در یک محل ثبت و مدیریت شوند؟
-```
-
-هدف این است که **Feature از روی نیاز کشف شود، نه اینکه ابتدا Feature پیشنهاد شود و بعد برای آن دلیل پیدا کنیم.**
-
----
-
-# 3. Website Classification & Site DNA
-
-هر پروژه می‌تواند براساس ماهیت واقعی خود دسته‌بندی شود.
-
-یک نمونه Site DNA:
-
-```text
-BASE
-E-Commerce
-
-BUSINESS
-B2C
-
-SYSTEM
-Website + Internal Business Management System
-
-COMMERCE
-Products
-Categories
-Search
-Cart
-Checkout
-Orders
-Payments
-
-MANAGEMENT
-Admin Dashboard
-Inventory
-Customers
-CRM-lite
-Reports
-
-CONTENT
-CMS
-Blog
-
-GROWTH
-SEO
-Analytics
-Coupons
-
-AUTOMATION
-SMS
-Email
-n8n
-
-DEPLOYMENT
-Preview
-Production
-```
-
-Site DNA یک نمای سریع از ماهیت پروژه می‌دهد و برای تصمیم‌گیری درباره Scope، معماری و اولویت Featureها استفاده می‌شود.
-
----
-
-# Project Types
-
-HAFS یک پروژه را الزاماً «سایت ساده» یا «فروشگاه» فرض نمی‌کند.
-
-پروژه می‌تواند یکی از این مدل‌ها باشد:
-
-1. **Website**
-2. **Web Application**
-3. **Website + Internal Business Management System**
-4. **Platform**
-
-ساخت SaaS، Multi-Tenant Platform یا Site Builder فقط زمانی منطقی است که واقعاً جزو نیاز پروژه باشد.
-
----
-
-# 4. Project Scenario
-
-قبل از شروع Coding، پروژه به چند سناریوی قابل بررسی تقسیم می‌شود.
-
-## Business Scenario
-
-- Business Goal
-- Business Model
-- Audience
-- Value Proposition
-- Success Metrics
-- Revenue Logic
-
-## User Scenario
-
-- User Roles
-- Permissions
-- User Journey
-- Customer Journey
-- Staff Journey
-- Admin Journey
-
-## Pages Scenario
-
-نمونه:
-
-```text
-Public
-├── Home
-├── About
-├── Services
-├── Shop
-├── FAQ
-└── Contact
-
-Authentication
-├── Login
-├── Register
-└── Password Recovery
-
-Customer
-├── Dashboard
-├── Profile
-└── Orders
-
-Admin
-├── Dashboard
-├── Products
-├── Orders
-├── Customers
-└── Reports
-```
-
-## Feature Scenario
-
-Featureها براساس اولویت دسته‌بندی می‌شوند:
-
-- **Required** — ضروری برای عملکرد اصلی پروژه
-- **Recommended** — پیشنهاد حرفه‌ای برای کیفیت بهتر
-- **Optional** — مفید اما غیرضروری برای Launch
-- **Future** — مناسب فازهای بعدی
-
-این مدل برای کنترل Feature Creep بسیار مهم است.
-
----
-
-# 5. Architecture Planning
-
-قبل از Coding، Architecture Blueprint پروژه مشخص می‌شود.
-
-موارد قابل تعریف:
-
-- Frontend
-- Backend
-- Database
-- Authentication
-- Authorization
-- API
-- Storage
-- Search
-- Payments
-- Notifications
-- Integrations
-- Automation
-- Deployment
-- Monitoring
-- Logging
-- Backup
-- Security Model
-
-اصل مهم:
-
-> **Hosting نباید معماری پروژه را تعیین کند؛ Hosting باید براساس معماری انتخاب شود.**
-
----
-
-# 6. UI / UX Planning
-
-HAFS برای تصمیم‌های طراحی نیز فضای مشخص دارد.
-
-موارد قابل ثبت:
-
-- Visual Direction
-- Brand Personality
-- Design System
-- Typography
-- Spacing
-- Components
-- Responsive Rules
-- Mobile-first Decisions
-- RTL Support
-- Accessibility
-- Loading States
-- Empty States
-- Error States
-- Success States
-- Micro-interactions
-
-هدف این است که Design فقط مجموعه‌ای از صفحات زیبا نباشد، بلکه یک سیستم منسجم و قابل توسعه باشد.
-
----
-
-# 7. Codex Prompt Pack
-
-به‌جای ارسال یک Prompt مبهم مثل:
-
-```text
-Build the entire project.
-```
-
-HAFS پروژه را به Promptهای مرحله‌ای تقسیم می‌کند.
-
-نمونه ساختار:
-
-```text
-00 — Project Context
-01 — Architecture
-02 — Initialization
-03 — Design System
-04 — Layout
-05 — Database
-06 — Authentication
-07 — Core Features
-08 — Admin Panel
-09 — Business Management
-10 — Integrations
-11 — Payments
-12 — Automation
-13 — SEO / AEO / GEO
-14 — Security
-15 — Performance
-16 — Testing
-17 — Bug Fixing
-18 — Deployment
-19 — Documentation
-```
-
-هر Prompt می‌تواند شامل موارد زیر باشد:
-
-- Context
-- Objective
-- Scope
-- Constraints
-- Existing Architecture
-- Files Allowed To Change
-- Acceptance Criteria
-- Tests
-- Definition of Done
-- Do-Not-Break Rules
-
-این ساختار باعث می‌شود توسعه قابل کنترل‌تر و قابل بازبینی‌تر باشد.
-
----
-
-# 8. Build Management
-
-Build Checklist برای پیگیری مراحل توسعه استفاده می‌شود.
-
-Checklistها **اجباری نیستند**؛ فقط موارد مرتبط با پروژه انتخاب می‌شوند.
-
-یک پروژه کوچک ممکن است چند مورد محدود داشته باشد، در حالی که یک Web Application پیچیده می‌تواند ده‌ها مرحله Build داشته باشد.
-
-هدف Checklist، ایجاد محدودیت مصنوعی نیست؛ هدف این است که وضعیت پروژه فراموش نشود.
-
----
-
-# 9. QA #1 — Pre-Deployment Testing
-
-قبل از انتشار، پروژه از چند زاویه بررسی می‌شود.
-
-## Functional QA
-
-- Navigation
-- Forms
-- Authentication
-- Authorization
-- Database Operations
-- APIs
-- Payments
-- Search
-- Filters
-- Uploads
-- Notifications
-- Business Logic
-
-## UX QA
-
-- Desktop
-- Tablet
-- Mobile
-- Responsive Behavior
-- Accessibility
-- Loading States
-- Empty States
-- Error States
-
-## Code QA
-
-- Production Build
-- TypeScript
-- Lint
-- Console Errors
-- Broken Imports
-- Routes
-- Dependencies
-- Broken Links
-
-## Edge Cases
-
-- Network Failure
-- Duplicate Submission
-- Expired Session
-- Invalid Input
-- Out-of-Stock State
-- API Failure
-- Database Failure
-
----
-
-# Security Gate #1
-
-قبل از Production، موارد امنیتی مرتبط با پروژه بررسی می‌شوند.
-
-نمونه موارد:
-
-- Authentication
-- Authorization
-- Session Security
-- IDOR / Broken Access Control
-- Input Validation
-- XSS
-- CSRF
-- SSRF
-- Injection
-- API Security
-- Webhook Verification
-- File Upload Security
-- Secret Leakage
-- Dependency Vulnerabilities
-- CORS
-- CSP
-- Security Headers
-- Rate Limiting
-- Secure Cookies
-
-> تست امنیتی و Penetration Testing فقط روی سیستم‌هایی انجام می‌شود که مالک آن هستیم یا برای تست آن‌ها مجوز صریح داریم.
-
----
-
-# 10. Preview & Deployment
-
-HAFS بین Preview و Production تفاوت قائل می‌شود.
-
-## Preview
-
-برای:
-
-- Internal QA
-- Client Review
-- Testing
-- Debugging
-- Approval
-
-## Production
-
-برای نسخه نهایی قابل استفاده کاربران.
-
-پلتفرم Deployment می‌تواند براساس پروژه متفاوت باشد، برای مثال:
-
-- Vercel
-- Netlify
-- DashPloy
-- Railway
-- Render
-- Cloudflare
-- VPS
-
----
-
-# QA #2 — Post-Deployment Testing
-
-بعد از انتشار، تست‌ها در محیط واقعی دوباره بررسی می‌شوند.
-
-موارد رایج:
-
-- Domain
-- DNS
-- HTTPS / SSL
-- Redirects
-- Environment Variables
-- Production Database
-- Storage
-- Authentication
-- OAuth
-- API
-- Uploads
-- Payments
-- Callbacks
-- Webhooks
-- Email
-- SMS
-- Admin Panel
-- Browser Compatibility
-- Mobile Devices
-
----
-
-# Security Gate #2
-
-در Production بررسی‌های غیرمخرب انجام می‌شوند.
-
-نمونه:
-
-- TLS / Certificate
-- HSTS
-- CSP
-- CORS
-- Security Headers
-- Debug Endpoint Exposure
-- Admin Exposure
-- Storage Exposure
-- Backup Exposure
-- Source Map Policy
-- Sessions
-- API Authorization
-- Rate Limiting
-- Sensitive Error Messages
-
-تست‌های مخرب، High-volume یا Stress Testing باید روی Staging انجام شوند.
-
----
-
-# SEO / AEO / GEO
-
-HAFS سه حوزه را جدا در نظر می‌گیرد.
-
-## SEO — Search Engine Optimization
-
-- robots.txt
-- sitemap.xml
-- Canonical URLs
-- Metadata
-- Titles / Descriptions
-- Open Graph
-- Structured Data
-- Schema.org
-- Internal Linking
-- Redirects
-- HTTP Status Codes
-- Indexability
-- Custom 404
-
-## AEO — Answer Engine Optimization
-
-- FAQ Structure
-- Clear Questions & Answers
-- Semantic Content
-- Direct Answers
-- Structured Information
-
-## GEO — Generative Engine Optimization
-
-- Entity-rich Content
-- Structured Facts
-- Clear Brand Information
-- Product / Service Information
-- Reliable Page Structure
-- Concise Summaries
-
----
-
-# Performance
-
-موارد قابل بررسی:
-
-- Core Web Vitals
-- LCP
-- CLS
-- INP
-- Image Optimization
-- Font Optimization
-- Lazy Loading
-- Code Splitting
-- Caching
-- CDN
-- API Performance
-- Database Performance
-
----
-
-# Monitoring
-
-بعد از Launch می‌توان موارد زیر را پایش کرد:
-
-- Uptime
-- Errors
-- Performance
-- Traffic
-- Conversions
-- Broken Links
-- Security Events
-- Database Health
-- Search Indexing
-
----
-
-# Client Handover
-
-Handover حرفه‌ای می‌تواند شامل موارد زیر باشد:
-
-- Production URL
-- Admin URL
-- Repository
-- Secure Credential Transfer
-- Admin Guide
-- Architecture Summary
-- Environment Variable Guide
-- Deployment Guide
-- Backup Guide
-- Maintenance Guide
-- Database Information
-- Third-party Services
-- Domain Information
-- Known Limitations
-- Future Roadmap
-
-Secretها نباید داخل Documentation عمومی یا Repository ذخیره شوند.
-
----
-
-# Maintenance & Recurring Services
-
-HAFS پروژه را با Handover تمام‌شده فرض نمی‌کند.
-
-خدمات بعد از تحویل می‌توانند شامل موارد زیر باشند:
-
-- Website Maintenance
-- Security Updates
-- Backups
-- Monitoring
-- Performance Optimization
-- SEO
-- Content
-- Analytics
-- Digital Marketing
-- Automation
-- AI Integration
-- Feature Development
-
-این بخش می‌تواند پروژه یک‌باره را به یک رابطه بلندمدت با مشتری تبدیل کند.
-
----
-
-# Fullscreen Editor
-
-Textareaهای مهم دارای Fullscreen Editor هستند تا نوشتن و بررسی متن‌های طولانی راحت‌تر باشد.
-
-امکانات:
-
-- Fullscreen Editing
-- Copy
-- Character Counter
-- Word Counter
-- Save & Close
-- Keyboard Shortcuts
-
-مناسب برای:
-
-- Client Requirements
-- Scenario
-- Site DNA
-- Architecture
-- Codex Prompts
-- Deployment Notes
-
----
-
-# Sample Templates
-
-بخش‌های مهم دارای متن یا Template نمونه هستند تا کاربر از یک صفحه کاملاً خالی شروع نکند.
-
-نمونه‌ها فقط راهنما هستند و می‌توان آن‌ها را متناسب با پروژه واقعی جایگزین کرد.
-
-Checklistها و Module Selection نیز Presetهای نمونه دارند.
-
----
-
-# Optional Checklists
-
-Checkboxها برای نمایش «موارد مرتبط با پروژه» هستند و اجبار Workflow ایجاد نمی‌کنند.
-
-یک Checkbox خالی می‌تواند به این معنا باشد:
-
-- Not Required
-- Not Selected
-- Not Applicable
-- Review Later
-
-بنابراین برای رفتن به مرحله بعد لازم نیست همه گزینه‌ها انتخاب شوند.
-
----
-
-# Auto Save
-
-نسخه فعلی اطلاعات پروژه را در Browser ذخیره می‌کند.
-
-```text
-LocalStorage
-```
-
-این روش برای نسخه Single-User فعلی سبک و بدون Backend مناسب است.
-
-> LocalStorage جایگزین Database، Cloud Backup یا Collaboration Backend نیست.
-
----
-
-# Full Project Import / Export
-
-HAFS از Backup کامل پروژه با JSON پشتیبانی می‌کند.
-
-Export شامل موارد زیر است:
-
-- تمام Inputها
-- تمام Textareaها
-- تمام Selectها
-- Module Selections
-- Checklists
-- Approval States
-- Approval Timestamps
-- Current Wizard Step
-- Workflow State
-- Generated Codex Output
-- Handover Output
-
-فرمت فعلی Backup:
-
-```text
-HAFS_FULL_PROJECT
-```
-
-Workflow نمونه:
-
-```text
-Export
-   ↓
-Backup
-   ↓
-Reset
-   ↓
-Import
-   ↓
-Full Project Restore
-```
-
-قبل از Import، وضعیت فعلی پروژه نیز به‌صورت Local Backup نگهداری می‌شود تا احتمال از دست رفتن داده کاهش پیدا کند.
-
----
-
-# Approval System
-
-اصل مهم سیستم:
-
-```text
-Complete
-   ↓
-Review
-   ↓
-Approve
-   ↓
-Continue
-```
-
-Approval برای جلوگیری از عبور ناخواسته از تصمیم‌های مهم طراحی شده است.
-
----
-
-# Focus Mode
-
-برای کار روی متن‌ها و سناریوهای طولانی، Focus Mode می‌تواند Sidebar را کنار بگذارد و محیط کاری بزرگ‌تری ایجاد کند.
-
----
-
-# فناوری‌های نسخه فعلی
-
-```text
-HTML5
-CSS3
-Vanilla JavaScript
-LocalStorage
-JSON
-```
-
-نسخه فعلی بدون Framework و Dependency خارجی اجرا می‌شود.
-
-مزیت این معماری برای Prototype فعلی:
-
-- اجرای مستقیم
-- Deploy ساده
-- عدم نیاز به Build
-- Portability بالا
-- Debugging آسان‌تر
-
----
-
-# Project Structure
-
-```text
-project-ui-ai-temp/
-│
-├── index.html
-├── README.md
-├── vercel.json
-│
-├── assets/
-│   ├── HOSSEIN-HAFS-hero-overlay-1280x720.jpg
-│   └── ...
-│
-├── api/
-│   └── ...
-│
-└── .github/
-    └── ...
-```
-
-هسته رابط فعلی در `index.html` قرار دارد.
-
----
-
-# اجرای Local
-
-برای نسخه فعلی Build ضروری نیست.
-
-روش ساده:
-
-```bash
-git clone https://github.com/HosseinYazdanpanah/project-ui-ai-temp.git
-cd project-ui-ai-temp
-```
-
-سپس `index.html` را با Browser باز کنید.
-
-برای Development بهتر می‌توان از یک Static Server محلی استفاده کرد.
-
-نمونه:
-
-```bash
-npx serve .
-```
-
----
-
-# Deployment
-
-به دلیل Static بودن هسته فعلی، پروژه را می‌توان روی سرویس‌های مختلف Deploy کرد.
-
-نمونه:
-
-- Vercel
-- Netlify
-- GitHub Pages
-- Cloudflare Pages
-- DashPloy
-- Static Hosting
-
-Deployment نهایی باید با نیازهای نسخه آینده پروژه هماهنگ شود.
-
----
-
-# Data & Privacy
-
-نسخه فعلی برای پروژه‌های واقعی می‌تواند شامل اطلاعات تجاری مشتری باشد؛ بنابراین رعایت اصول Privacy مهم است.
-
-نباید Secretهای زیر داخل HTML، README یا Repository عمومی قرار داده شوند:
-
-- Passwords
-- API Keys
-- Access Tokens
-- Database Credentials
-- Payment Secrets
-- Private Client Credentials
-
-اگر اطلاعات واقعی مشتری داخل HAFS ثبت می‌شود، نسخه Online بهتر است Private یا Protected باشد.
-
----
-
-# Design Principles
-
-### Plan Before Code
-قبل از توسعه، نیاز و معماری مشخص شوند.
-
-### Business Before Features
-هر Feature باید دلیل روشن داشته باشد.
-
-### Human Approval
-AI یا Automation نباید تصمیم‌های اصلی را بدون تأیید انسان نهایی کند.
-
-### No Feature Bloat
-تعداد بیشتر قابلیت‌ها الزاماً محصول بهتری ایجاد نمی‌کند.
-
-### Security by Design
-امنیت باید از ابتدا جزئی از معماری باشد.
-
-### QA Before Release
-Release بدون Testing مناسب نباید انجام شود.
-
-### Maintainability
-خروجی باید قابل نگهداری و توسعه باشد.
-
-### Client Ownership
-مالکیت Domain، Repository، Accounts و سرویس‌های اصلی باید شفاف باشد.
-
----
-
-# Roadmap
-
-برخی قابلیت‌هایی که برای نسخه‌های آینده قابل بررسی هستند:
-
-- AI Client Interview Assistant
-- Sales Conversation Assistant
-- Dynamic Question Generator
-- Requirement Intelligence Engine
-- Automatic Site Classification
-- Site DNA Generator
-- AI Scenario Generator
-- Architecture Assistant
-- Advanced Codex Prompt Generation
-- Multi-Project Workspace
-- Version History
-- Draft / Review / Approved States
-- Project Timeline
-- Cost Estimation
-- Proposal Generator
-- Contract Generator
-- Invoice Generator
-- Client Portal
-- Collaboration
-- Cloud Persistence
-- GitHub Integration
-- Vercel Integration
-- Netlify Integration
-- DashPloy Integration
-- Automated QA
-- Security Scanner
-- SEO Audit
-- Lighthouse Integration
-- CRM
-- Follow-up System
-- Analytics Dashboard
-
-Roadmap بیانگر جهت توسعه است و الزاماً نشان‌دهنده قابلیت موجود در نسخه فعلی نیست.
-
----
-
-# Vision
-
-چشم‌انداز HAFS تبدیل شدن به یک **AI-assisted Freelance Operating System** است که بتواند یک پروژه را از ورودی خام مشتری تا تحویل نهایی، با نظارت و تأیید انسان مدیریت کند.
-
-```text
-Client Message
-      ↓
-Requirement Analysis
-      ↓
-Client Interview
-      ↓
-Business Analysis
-      ↓
-Site Classification
-      ↓
-Site DNA
-      ↓
-Scenario
-      ↓
-Architecture
-      ↓
-Codex Prompt Pack
-      ↓
-Development
-      ↓
-QA
-      ↓
-Security
-      ↓
-Deployment
-      ↓
-SEO / Performance
-      ↓
-Monitoring
-      ↓
-Handover
-```
-
-هدف نهایی حذف نقش انسان نیست؛ هدف این است که AI کارهای تحلیلی، تکراری و ساختاری را تسهیل کند و تصمیم‌های اصلی همچنان تحت کنترل Project Owner باقی بمانند.
-
----
-
-# Project Owner
-
-**Hossein Yazdanpanah**
-
-```text
-Project Owner
-Client Lead
-Final Decision Maker
-```
-
-برند:
-
-**HOSSEIN — AI • WEB • AUTOMATION**
-
----
-
-# Current Status
-
-```text
-Project: HAFS
-Full Name: Hossein AI Freelance System
-Status: Active Development
-Current Architecture: Single-File Web Application
-Primary Language: Persian / RTL
-Secondary Language: English Technical Terms
-Primary Use: Freelance Web Project Workflow Management
-Persistence: Browser LocalStorage + JSON Backup
-Repository: project-ui-ai-temp
-```
-
----
+**License:** No root `LICENSE` file is currently present in this repository. Source visibility does not automatically grant permission for copying, redistribution or commercial reuse.
 
 <div align="center">
 
-## HAFS
+### HAFS · Plan with clarity. Build with confidence. Deliver with proof.
 
-### From the first client message to final delivery.
-
-**Think • Analyze • Plan • Approve • Build • Test • Secure • Deploy • Grow**
-
-<br>
-
-**HOSSEIN — AI • WEB • AUTOMATION**
+**توسعه بهتر از تصمیم‌های بهتر شروع می‌شود.** ✨
 
 </div>
